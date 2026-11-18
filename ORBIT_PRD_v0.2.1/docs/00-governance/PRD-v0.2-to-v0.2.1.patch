@@ -1,0 +1,433 @@
+--- v0.2/README.md
++++ v0.2.1/README.md
+@@ -1,6 +1,8 @@
+-# ORBIT — Modular PRD, revisi DDP1 v0.2
++# ORBIT — Modular PRD, revisi DDP1 v0.2.1
+ 
+-Tanggal: **18 November 2026 (Asia/Jakarta)**. Ini revisi terarah atas baseline v0.1, bukan regenerasi PRD atau implementasi aplikasi. Nama 13 PRD, 20 bagian per PRD dan seluruh requirement ID lama dipertahankan. Nama folder historis ORBIT_PRD_v0.1 tetap untuk menjaga identitas/path; versi isi saat ini **v0.2 DDP1 Draft**.
++Tanggal: **18 November 2026 (Asia/Jakarta)**. Ini revisi terarah atas baseline v0.1, bukan regenerasi PRD atau implementasi aplikasi. Nama 13 PRD, 20 bagian per PRD dan seluruh requirement ID lama dipertahankan. Folder dokumen historis bernama `ORBIT_PRD_v0.1`; nama itu tidak menyatakan akar folder arsip. ZIP v0.2 berakar di `ORBIT_PRD_v0.2/`, sedangkan paket errata **v0.2.1** berakar di **`ORBIT_PRD_v0.2.1/`**. Untuk otomatisasi, gunakan nilai `archive_root` pada manifest. Dokumen yang tidak terdampak tetap versi v0.2; empat PRD yang dikoreksi ditandai v0.2.1.
++
++**Status: CONDITIONAL GO untuk desain arsitektur.** Kapasitas anggota (RV-14), kebaruan konsep di luar kelas (RV-15), dan kesiapan stack pada perangkat tim belum terbukti. Hanya FR P0 dan gate terkait menjadi scope awal; P1/P2 membutuhkan aktivasi eksplisit melalui perubahan scope tercatat. Lihat [PRD-v0.2.1-ERRATA.md](docs/00-governance/PRD-v0.2.1-ERRATA.md).
+ 
+ ## Mulai dari laporan revisi
+ 
+@@ -14,7 +16,7 @@
+ 
+ Gunakan [Product Document Index](docs/00-governance/PRODUCT-DOC-INDEX.md) untuk 13 PRD dan governance, [glossary/decisions](docs/00-governance/GLOSSARY-AND-DECISION-LOG.md), [RTM](docs/00-governance/REQUIREMENTS-TRACEABILITY-MATRIX.md), [source/validation register](docs/00-governance/RESEARCH-AND-VALIDATION-REGISTER.md), dan [QA dokumentasi](docs/00-governance/QA-DOCUMENTATION-REPORT.md).
+ 
+-Paket v0.2: **143 FR (48 P0, 27 P1, 68 P2),102 BR, 39 NFR, 182 AC/test primer, 14 test integrasi**. Semua 141 FR lama tetap; dua FR baru membatasi demo lokal dan export/reset. Seluruh test aplikasi berstatus belum dieksekusi. P2 tetap Future Development; P1 opsional setelah gate kapasitas. Teks visi lengkap tidak berarti semua kemampuan wajib dibangun pada rilis ini.
++Jumlah requirement tetap sejak v0.2: **143 FR (48 P0, 27 P1, 68 P2),102 BR, 39 NFR, 182 AC/test primer, 14 test integrasi**. Semua 141 FR lama tetap; dua FR baru membatasi demo lokal dan export/reset. Seluruh test aplikasi berstatus belum dieksekusi. P2 tetap Future Development; P1 opsional setelah gate kapasitas. Teks visi lengkap tidak berarti semua kemampuan wajib dibangun pada rilis ini.
+ 
+ ## Arah rilis
+ 
+@@ -24,6 +26,6 @@
+ 
+ ## Jejak revisi
+ 
+-Baseline v0.1 diperiksa melalui 19 checksum sebelum perubahan. [Diff v0.1→v0.2](docs/00-governance/PRD-v0.1-to-v0.2.patch) menyimpan perubahan literal pada berkas baseline (manifest checksum dikecualikan untuk menghindari referensi hash berputar). [MANIFEST.json](MANIFEST.json) berisi hash artefak versi sekarang. Arsip v0.1 lama tetap menjadi snapshot historis; arsip **ORBIT_PRD_v0.2-DDP1-Audit.zip** memuat paket revisi ini.
++Baseline v0.1 diperiksa melalui 19 checksum sebelum perubahan. [Diff v0.1→v0.2](docs/00-governance/PRD-v0.1-to-v0.2.patch) menyimpan perubahan literal pada berkas baseline (manifest checksum dikecualikan untuk menghindari referensi hash berputar). [MANIFEST.json](MANIFEST.json) berisi hash artefak versi sekarang. Arsip v0.1 lama tetap menjadi snapshot historis; arsip **ORBIT_PRD_v0.2-DDP1-Audit.zip** mempertahankan snapshot sebelum errata. Paket sekarang adalah **ORBIT_PRD_v0.2.1-DDP1-Errata.zip**. [Diff v0.2→v0.2.1](docs/00-governance/PRD-v0.2-to-v0.2.1.patch) mencatat koreksi terbaru.
+ 
+ Tidak ada kode aplikasi, deployment, video atau pengumpulan tugas yang dilakukan pada tahap audit ini.
+--- v0.2/docs/00-governance/GLOSSARY-AND-DECISION-LOG.md
++++ v0.2.1/docs/00-governance/GLOSSARY-AND-DECISION-LOG.md
+@@ -1,6 +1,6 @@
+ # ORBIT — Glossary & Decision Log
+ 
+-Versi: **v0.2 DDP1 Draft** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
++Versi: **v0.2.1 DDP1 Errata** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
+ 
+ 
+ ## Aturan canon
+@@ -121,3 +121,9 @@
+ | D-21 | Satu skenario, dataset kecil dan struktur BRP dikunci setelah skor; stale memakai reset/pilih ulang | Menunda subkemampuan rebase/migrasi; invariants D-02/D-05 tetap | MAP-FR-006; GRD-FR-001/020; daftar/list sebagai UI dasar |
+ 
+ Aturan tugas bukan kebijakan akademik mata kuliah. SRC-11 tidak menutup RV-02/03/04, tidak mengizinkan SSO/SLCM, dan tidak mewajibkan fitur tertentu, framework, deployment publik, jumlah commit atau angka nilai tertentu.
++
++## D-22 — Errata capability dan handoff, 18 November 2026
++
++Review independen menemukan empat label prioritas bisnis yang belum mengikuti FR: UX-BR-001/002, PUB-BR-006 dan SUP-BR-001. Label tersebut dikoreksi, bukan reprioritisasi FR: dark mode dan Career Navigator tetap P2, contact/feedback P2, search P1. Navigasi mengikuti capability manifest; fitur nonaktif tidak memperoleh aksi aktif hanya karena muncul dalam desain atau journey lengkap. Scope awal tetap 48 FR P0 dan gate terkait; aktivasi P1/P2 memerlukan keputusan scope eksplisit yang tercatat. D-01–D-21 tetap sebagai riwayat, dengan supersesi yang sudah dijelaskan.
++
++Owner: Product Lead/tim. Dasar: SRC-16 review independen dan pengecekan langsung terhadap v0.2. Keputusan ini menutup kontradiksi dokumentasi; tidak menutup RV-14/15 atau membuktikan kesiapan runtime. Status tetap CONDITIONAL GO untuk desain arsitektur. Lihat [errata](PRD-v0.2.1-ERRATA.md).
+--- v0.2/docs/00-governance/IMPLEMENTATION-READINESS-REPORT.md
++++ v0.2.1/docs/00-governance/IMPLEMENTATION-READINESS-REPORT.md
+@@ -1,12 +1,12 @@
+ # ORBIT — Implementation Readiness Report
+ 
+-Versi **v0.2 DDP1 Draft** · 18 November 2026 (Asia/Jakarta) · Owner: Product Lead bersama tim 3–4 mahasiswa.
++Versi **v0.2.1 DDP1 Errata** · 18 November 2026 (Asia/Jakarta) · Owner: Product Lead bersama tim 3–4 mahasiswa.
+ 
+ Status: audit dan rekomendasi dokumentasi; belum ada aplikasi atau bukti kelulusan implementasi.
+ 
+ ## Status kesiapan
+ 
+-**Siap sebagai spesifikasi untuk perencanaan pembangunan demo lokal; belum siap dinyatakan sebagai aplikasi selesai, layanan publik atau sistem akademik resmi.** Panduan sudah diverifikasi, scope/dependency dan kontrak Python utama sudah dijelaskan. Kesiapan memulai implementasi masih bersyarat pada jam/kemampuan tim dan pilihan konsep di luar kelas. Tugas ini hanya menghasilkan audit/revisi dokumentasi, tanpa kode aplikasi.
++**CONDITIONAL GO untuk desain arsitektur demo lokal; belum dapat disebut MVP final atau siap implementasi penuh sebelum kapasitas, kebaruan konsep dan kesiapan perangkat tervalidasi.** Panduan sudah diverifikasi, scope/dependency dan kontrak Python utama sudah dijelaskan. Kesiapan memulai implementasi masih bersyarat pada jam/kemampuan tim dan pilihan konsep di luar kelas. Tugas ini hanya menghasilkan audit/revisi dokumentasi, tanpa kode aplikasi.
+ 
+ Repository/video implementasi belum diberikan. Nama anggota/Asdos, ketersediaan kerja, versi runtime, kurikulum/BRP/policy aktual dan akses kampus belum dikonfirmasi. Hal ini tidak memblokir perencanaan atau demo berbasis fixture sintetis, tetapi membatasi klaim dan rilis data nyata.
+ 
+@@ -150,3 +150,13 @@
+ - [ ] Kedua tautan dikumpulkan melalui kanal pengajar; bukti waktu≤10 Des 2026 23.59 WIB disimpan.
+ 
+ **Tidak ada klaim siap produksi:** data akademik nyata/SSO/SLCM/komunitas membutuhkan keputusan serta bukti tambahan sesuai RV masing-masing. Hambatan itu tidak dijadikan alasan menunda dokumentasi atau demo sintetis yang telah direncanakan.
++
++## Handoff v0.2.1 — scope awal yang diizinkan
++
++Status **CONDITIONAL GO untuk desain arsitektur**, bukan MVP final atau bukti siap implementasi penuh. Sebelum komitmen delivery, lengkapi kapasitas nyata anggota (RV-14), konsep yang benar-benar di luar kelas (RV-15), dan bukti runtime/stack dapat dijalankan pada perangkat tim. Estimasi 84–100 jam-orang adalah estimasi paket; perlu dipecah menurut pekerjaan implementasi/FR dan diestimasi ulang setelah spike yang kelak diotorisasi. Audit/errata ini tidak mengerjakan spike atau kode aplikasi.
++
++Default handoff: hanya 48 FR P0 beserta BR/NFR/AC/test untuk kemampuan yang aktif. Semua P1/P2 nonaktif; subkemampuan future dalam FR P0 campuran (misalnya rebase penuh MAP-FR-006) juga nonaktif. Lolos gate kapasitas tidak otomatis mengaktifkan fitur: catat keputusan scope, ID yang diaktifkan, dependensi dan test, lalu perbarui capability manifest. Jangan menambahkan fitur dari journey produk lengkap atau mockup Figma sebagai P0 tersirat.
++
++Desain arsitektur berikutnya dapat merinci monolit Python modular, rencana file per file, kontrak data/revision dan test plan. IPS/IPK/tren tetap P1; Senior Playbook, Career Navigator, full closeout dan dark mode tetap P2. Dashboard P0 memakai hasil MAP/GRD yang benar-benar dihitung atau unknown/unavailable; tidak mengisi kartu IPK/tren/insight dengan data ilustrasi seolah hasil nyata. Roadmap dapat memakai tema terang dan list accessible sesuai baseline; identitas visual Orbit tetap.
++
++Rincian koreksi dan bukti penutupan ada di [PRD-v0.2.1-ERRATA.md](PRD-v0.2.1-ERRATA.md).
+--- v0.2/docs/00-governance/MVP-SCOPE-AND-PRIORITIES.md
++++ v0.2.1/docs/00-governance/MVP-SCOPE-AND-PRIORITIES.md
+@@ -1,6 +1,6 @@
+ # ORBIT — MVP Scope and Priorities
+ 
+-Versi **v0.2 DDP1 Draft** · 18 November 2026 (Asia/Jakarta) · Owner: Product Lead bersama tim 3–4 mahasiswa.
++Versi **v0.2.1 DDP1 Errata** · 18 November 2026 (Asia/Jakarta) · Owner: Product Lead bersama tim 3–4 mahasiswa.
+ 
+ Status: audit dan rekomendasi dokumentasi; belum ada aplikasi atau bukti kelulusan implementasi.
+ 
+@@ -144,3 +144,13 @@
+ Seluruh FR P0 yang aktif serta NFR terkait mempunyai bukti test; demo inti selesai dengan modul opsional off; data/sumber/scenario jujur; repository publik dapat dijalankan dari README dan menunjukkan kontribusi seluruh anggota; setiap anggota memahami semua bagian kode; video YouTube≤15 menit mencakup masalah, demo dan arsitektur; dua tautan dikumpulkan tepat waktu. P1/P2 yang tidak dibangun berlabel ditunda, bukan gagal atau fitur tersembunyi.
+ 
+ Rujukan teknis primer (diakses 18 Nov 2026): [Flask](https://flask.palletsprojects.com/en/stable/), [sqlite3](https://docs.python.org/3/library/sqlite3.html), [unittest](https://docs.python.org/3/library/unittest.html), [Streamlit architecture](https://docs.streamlit.io/develop/concepts/architecture). Rujukan aturan resmi dan nomor halaman ada di Compliance Matrix.
++
++## Handoff v0.2.1 — scope awal yang diizinkan
++
++Status **CONDITIONAL GO untuk desain arsitektur**, bukan MVP final atau bukti siap implementasi penuh. Sebelum komitmen delivery, lengkapi kapasitas nyata anggota (RV-14), konsep yang benar-benar di luar kelas (RV-15), dan bukti runtime/stack dapat dijalankan pada perangkat tim. Estimasi 84–100 jam-orang adalah estimasi paket; perlu dipecah menurut pekerjaan implementasi/FR dan diestimasi ulang setelah spike yang kelak diotorisasi. Audit/errata ini tidak mengerjakan spike atau kode aplikasi.
++
++Default handoff: hanya 48 FR P0 beserta BR/NFR/AC/test untuk kemampuan yang aktif. Semua P1/P2 nonaktif; subkemampuan future dalam FR P0 campuran (misalnya rebase penuh MAP-FR-006) juga nonaktif. Lolos gate kapasitas tidak otomatis mengaktifkan fitur: catat keputusan scope, ID yang diaktifkan, dependensi dan test, lalu perbarui capability manifest. Jangan menambahkan fitur dari journey produk lengkap atau mockup Figma sebagai P0 tersirat.
++
++Desain arsitektur berikutnya dapat merinci monolit Python modular, rencana file per file, kontrak data/revision dan test plan. IPS/IPK/tren tetap P1; Senior Playbook, Career Navigator, full closeout dan dark mode tetap P2. Dashboard P0 memakai hasil MAP/GRD yang benar-benar dihitung atau unknown/unavailable; tidak mengisi kartu IPK/tren/insight dengan data ilustrasi seolah hasil nyata. Roadmap dapat memakai tema terang dan list accessible sesuai baseline; identitas visual Orbit tetap.
++
++Rincian koreksi dan bukti penutupan ada di [PRD-v0.2.1-ERRATA.md](PRD-v0.2.1-ERRATA.md).
+--- v0.2/docs/00-governance/PRD-AUDIT-REPORT.md
++++ v0.2.1/docs/00-governance/PRD-AUDIT-REPORT.md
+@@ -5,6 +5,8 @@
+ Status: audit dan rekomendasi dokumentasi; belum ada aplikasi atau bukti kelulusan implementasi.
+ 
+ [Panduan resmi DDP1 yang diaudit](https://chatgpt.com/library?file_id=libfile_56bfcb27965c81918a1b5748323aff62&account_id=personal).
++
++**Catatan v0.2.1:** laporan ini menyimpan hasil audit v0.2. Review independen kemudian menemukan empat label bisnis yang belum konsisten, satu penjelasan akar arsip dan risiko interpretasi journey. Koreksi serta batas penutupan dicatat di [errata](PRD-v0.2.1-ERRATA.md); angka FR/AC/test tidak berubah. Klaim konsistensi struktur pada v0.2 tidak berarti seluruh label semantik telah benar.
+ 
+ ## Kesimpulan audit
+ 
+--- v0.2/docs/00-governance/PRD-REVISION-CHANGELOG.md
++++ v0.2.1/docs/00-governance/PRD-REVISION-CHANGELOG.md
+@@ -1,6 +1,8 @@
+ # ORBIT — PRD Revision Changelog
+ 
+ Versi **v0.1 Draft → v0.2 DDP1 Draft** · 18 November 2026 (Asia/Jakarta) · Owner: Product Lead bersama reviewer domain.
++
++**Revisi terbaru: v0.2.1 errata.** Riwayat v0.1→v0.2 di bawah dipertahankan. Tambahan di akhir mencatat ERR-01–06 dari review independen; scope, semua FR/AC/test dan ID tetap.
+ 
+ ## Dasar dan batas perubahan
+ 
+@@ -208,3 +210,20 @@
+ ## Dokumen baru dan ketidakpastian tersisa
+ 
+ Lima laporan yang diminta dibuat terpisah: audit, compliance matrix, MVP scope, changelog ini, dan implementation readiness. Diff tambahan memberikan jejak literal revisi. Tidak ada kode aplikasi yang ditambahkan, tidak ada Figma diubah, integrasi/izin tidak diklaim tersedia, dan tidak ada nilai penilaian dijanjikan. Keputusan scope/stack adalah rekomendasi berdasarkan kelayakan; kapasitas aktual tim dan kebaruan terhadap materi kelas perlu diverifikasi sebelum komitmen delivery.
++
++## v0.2 → v0.2.1 — 18 November 2026
++
++Sumber: SRC-16 review independen; diperiksa terhadap baseline v0.2 aktual. Tidak ada prioritas FR yang berubah. Empat BR, penjelasan archive root dan pelabelan journey dikoreksi. Hasil validasi baru terpisah dari hasil historis v0.2.
++
++| Change ID | Perubahan | Alasan / dampak |
++| --- | --- | --- |
++| ERR-01 | UX-BR-001: P1 dark → P2 dark, capability explicit | Selaras UX-FR-010 dan scope future; RTM diperbarui |
++| ERR-02 | UX-BR-002: Minat & Jalur bila P1 → menu mengikuti capability, CAR P2 | Menghilangkan dependency tersirat dan navigasi fitur nonaktif; RTM diperbarui |
++| ERR-03 | PUB-BR-006: contact P0 → feedback/contact P2 | Selaras PUB-FR-008/SUP-FR-005; bukan dependency core; RTM diperbarui |
++| ERR-04 | SUP-BR-001: corpus P0 → saat search P1 aktif | Selaras SUP-FR-001; batas data tidak berubah; RTM diperbarui |
++| ERR-05 | README membedakan folder historis, root ZIP v0.2 dan root v0.2.1; manifest archive_root | Menghindari asumsi path keliru; arsip lama tetap |
++| ERR-06 | Journey PRD-00/09 diberi label; J1 lokal tanpa login; login/closeout/komunitas future; batas handoff eksplisit | P0 tidak meluas dari cerita produk lengkap; scope/readiness/index diperjelas |
++
++PRD terdampak hanya 00/09/11/12, dengan metadata versi v0.2.1; sembilan PRD lain byte-identik dengan v0.2. Changelog ini, RTM, glossary D-22, research SRC-16, scope/readiness/index/audit/QA, README dan manifest diselaraskan. Compliance Matrix dan diff historis v0.1→v0.2 dipertahankan. Lampiran review pengguna tidak diubah.
++
++Before/after empat BR dan penutupan enam temuan ada di [PRD-v0.2.1-ERRATA.md](PRD-v0.2.1-ERRATA.md). [Patch v0.2→v0.2.1](PRD-v0.2-to-v0.2.1.patch) merekam setiap perubahan literal pada berkas baseline selain manifest. Masalah kapasitas RV-14, kebaruan RV-15 dan kesiapan runtime tetap belum ditutup; tidak ada coding atau test aplikasi dalam errata ini.
+--- v0.2/docs/00-governance/PRODUCT-DOC-INDEX.md
++++ v0.2.1/docs/00-governance/PRODUCT-DOC-INDEX.md
+@@ -1,7 +1,9 @@
+ # ORBIT — Product Document Index
+ 
+-Versi: **v0.2 DDP1 Draft** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
++Versi: **v0.2.1 DDP1 Errata** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
+ 
++
++**Paket terbaru: v0.2.1 errata.** Empat PRD terdampak dikoreksi; sembilan PRD lain tetap byte-identik dengan v0.2. [Errata dan batas handoff](PRD-v0.2.1-ERRATA.md) melengkapi lima laporan sebelumnya. Hanya FR P0 dan gate terkait aktif pada scope awal; P1/P2 memerlukan keputusan scope tercatat.
+ 
+ ## Cara memakai paket
+ 
+--- v0.2/docs/00-governance/QA-DOCUMENTATION-REPORT.md
++++ v0.2.1/docs/00-governance/QA-DOCUMENTATION-REPORT.md
+@@ -3,6 +3,8 @@
+ > Dokumen ini mempertahankan audit historis v0.1. Status versi sekarang ada di lampiran v0.2 di akhir; ketidaktersediaan panduan pada bagian historis telah ditutup oleh SRC-11.
+ 
+ Versi **v0.1 Draft** · Tanggal **18 November 2026 (Asia/Jakarta)** · Owner **QA Lead**.
++
++**QA terbaru: errata v0.2.1.** Bagian audit v0.1/v0.2 tetap historis. Koreksi semantik dan pemeriksaan paket terbaru dicatat pada lampiran v0.2.1 di akhir; tidak ada test aplikasi dijalankan.
+ 
+ ## Kesimpulan dan batas
+ 
+@@ -71,7 +73,7 @@
+ 1. Scope personal tidak membutuhkan SSO, SLCM, dataset kating atau ML. Community analytics dan career navigator adalah P1, integrasi P2; gate kualitas untuk P1 hanya berlaku saat diaktifkan.
+ 2. Offering personal memungkinkan input BRP ketika kurikulum belum pasti. Profile migration tidak mengubah historical credits/final grades. Scope source yang unknown menahan klaim eligibility resmi.
+ 3. Bobot diperiksa per sibling group dan per nilai: sum 100 saja tidak cukup karena 150/−50 juga sum 100. Input nonfinite, max_score0, target di luar rentang dan over-allocation ditolak.
+-4. Observed average, contribution points, bounds, prediction dan actual final dipisahkan. Full precision dipakai untuk threshold sebelum format; 84,995 dapat tampil 85,00 tetapi tidak melampaui threshold 85 pada fixture.
++4. Observed average, contribution points, bounds, prediction dan actual final dipisahkan. Full precision dipakai untuk threshold sebelum format; 84, 995 dapat tampil 85,00 tetapi tidak melampaui threshold 85 pada fixture.
+ 5. Deadline dimiliki Assessment (GRD), dengan SCH sebagai editor terdelegasi. Allocation memindahkan jam antarminggu tanpa menggandakan total. Kapasitas unknown/zero dan date-only tidak dipaksakan menjadi angka/waktu tertentu.
+ 6. Closeout tidak menyalin prediction menjadi actual otomatis. Revision check, idempotency dan unresolved status dirancang agar retry/concurrent edit tidak membuat riwayat salah.
+ 7. Nilai pribadi tidak disumbangkan otomatis. Fixed-cell threshold k=10 hanya usulan minimum; suppression, anti-differencing, review dan withdrawal masih dibutuhkan. Jika belum feasible, analytics tetap off.
+@@ -91,21 +93,40 @@
+ 
+ Review PRD-00 dan D-03 untuk scope; glossary untuk data; PRD-02/03 untuk akademik/perhitungan; PRD-10 untuk privasi/integrasi; PRD-09 untuk UX; RTM untuk acceptance. Tutup RV-01 sebelum memilih stack. Selesaikan RV-02/03/04/10 sebelum memakai data nyata dengan klaim aturan akademik. Gate P1/P2 mengikuti modul yang dipilih, bukan menunda MVP manual.
+ 
+-## Lampiran QA revisi v0.2 —18 November 2026
++## Lampiran QA revisi v0.2 — 18 November 2026
+ 
+ Audit baru memeriksa dokumen hasil revisi, bukan aplikasi. Panduan resmi seluruh 5 halaman dibaca melalui teks dan visual; baseline 19 checksum cocok sebelum edit. Hasil historis 34 reference checks di atas tetap milik v0.1, tidak digabung sebagai test aplikasi atau dianggap pengujian baru.
+ 
+ | Pemeriksaan v0.2 | Hasil |
+ | --- | --- |
+-|13 judul/nama PRD dan 20 bagian asli | Dipertahankan |
++| 13 judul/nama PRD dan 20 bagian asli | Dipertahankan |
+ | ID baseline FR/BR/NFR/AC/T/US | Semua dipertahankan, tidak ada duplikat definisi dalam PRD |
+ | FR/BR/NFR sekarang |143 /102 /39 |
+ | AC/test primer sekarang |182 /182, referensi FR dan prioritas test cocok |
+ | RTM |284 row requirement cocok sumber;14 integrasi terdaftar |
+-| Prioritas FR |48 P0 /27 P1 /68 P2;91 FR lama berubah prioritas |
++| Prioritas FR |48 P0 / 27 P1 / 68 P2;91 FR lama berubah prioritas |
+ | Tautan relatif dokumen aktif |440 diperiksa, tidak ada target hilang |
+ | Struktur tabel Markdown | Jumlah kolom konsisten per tabel pada dokumen aktif yang diperiksa |
+ | Reference arithmetic |12 pemeriksaan independen dokumen lulus: golden math inti, effort/capacity, rubric total dan runtime video |
+ | Implementasi / test aplikasi | Tidak dibuat atau dijalankan; seluruh test aplikasi tetap belum dieksekusi |
+ 
+ Pemeriksaan struktur tidak membuktikan semua cabang acceptance cukup atau implementasi sesuai. Gap semantik yang memerlukan test tambahan ada di Implementation Readiness (DDP-T-01–13). NFR aksesibilitas/latency, data nyata, konsep di luar kelas, kontribusi GitHub dan video tetap memerlukan bukti aktual. Manifest/checksum paket diperbarui setelah QA ini; patch menyimpan perubahan literal baseline.
++
++## Lampiran QA v0.2.1 — 18 November 2026
++
++Pemeriksaan ditargetkan pada enam temuan review independen dan dampaknya. Tidak mengulang atau mengklaim ulang hasil benchmark/aplikasi; hasil aritmetika v0.2 tetap historis karena rumus tidak berubah.
++
++| Pemeriksaan | Hasil |
++| --- | --- |
++| Baseline sebelum edit | 25 hash manifest v0.2 cocok; identitas/versi/ukuran berkas aktif sesuai metadata terkini |
++| Empat label BR yang dilaporkan | UX-BR-001/002, PUB-BR-006, SUP-BR-001 konsisten dengan FR dan row RTM |
++| Root ZIP | v0.2=ORBIT_PRD_v0.2/; paket baru v0.2.1=ORBIT_PRD_v0.2.1/; README/manifest menjelaskan perbedaannya |
++| Journey master/UX | Label P0/P1/P2 eksplisit; login hanya varian future; batas handoff P0+gate ditambahkan |
++| FR/NFR/AC/test primer/user stories | Seluruh baris identik dengan v0.2; tidak ada ID ditambah/dihapus/diganti |
++| BR | 102 ID tetap; tepat 4 BR yang berubah |
++| PRD | 13 judul dan 20 bagian per PRD tetap; 4 PRD terdampak, 9 PRD byte-identik |
++| Prioritas FR | Tetap 48 P0 / 27 P1 / 68 P2, total 143 |
++| Tautan/tabel | Semua target tautan relatif yang diperiksa ada; kolom tiap tabel konsisten |
++| Bukti kesiapan | RV-14/15 dan runtime tetap belum tervalidasi; tidak ada aplikasi/tes aplikasi dibuat |
++
++Sebaran ID dan tautan yang valid tidak membuktikan konsistensi semantik seluruh dokumentasi; temuan review ini menunjukkan batas pemeriksaan struktural sebelumnya. Pemeriksaan baru menutup enam temuan tersebut, bukan sertifikasi bebas seluruh kemungkinan masalah. Detail ada di errata dan changelog.
+--- v0.2/docs/00-governance/REQUIREMENTS-TRACEABILITY-MATRIX.md
++++ v0.2.1/docs/00-governance/REQUIREMENTS-TRACEABILITY-MATRIX.md
+@@ -1,6 +1,6 @@
+ # ORBIT — Requirements Traceability Matrix
+ 
+-Versi: **v0.2 DDP1 Draft** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
++Versi: **v0.2.1 DDP1 Errata** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
+ 
+ 
+ ## Cakupan dan penggunaan
+@@ -218,8 +218,8 @@
+ | UX-FR-008 | P0 | Gunakan label dan ikon selain warna | UX-AC-008 | UX-T-008 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | P0 specified; not executed |
+ | UX-FR-009 | P1 | Render hanya data yang tersedia dengan gap untuk missing; proyeksi berlabel | UX-AC-009 | UX-T-009 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Optional; not executed |
+ | UX-FR-010 | P2 | Terapkan token semantik seluruh modul secara konsisten | UX-AC-010 | UX-T-010 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Future Development; deferred |
+-| UX-BR-001 | Mengikuti FR | Source visual hanya arah: Dashboard v2 terang, Roadmap v2 gelap. P0 memilih tema terang lintas halaman; P1 dark harus berlaku global dan diuji sendiri. | UX-AC-010, UX-AC-001 | UX-T-010, UX-T-001 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
+-| UX-BR-002 | Mengikuti FR | Navigasi primary: Ringkasan, Roadmap, Nilai & Target, Jadwal, Komunitas. Vault/Playbook berada di Komunitas; Minat & Jalur tampil bila P1 aktif. Pengaturan/Bantuan tetap tersedia. | UX-AC-001, UX-AC-003 | UX-T-001, UX-T-003 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
++| UX-BR-001 | Mengikuti FR | Source visual hanya arah: Dashboard v2 terang, Roadmap v2 gelap. P0 memilih tema terang lintas halaman; dark mode P2 harus berlaku global dan diuji sendiri, serta hanya tampil aktif bila capability tema gelap diaktifkan. | UX-AC-010, UX-AC-001 | UX-T-010, UX-T-001 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
++| UX-BR-002 | Mengikuti FR | Navigasi mengikuti capability manifest, bukan label prioritas saja. P0 menampilkan Ringkasan, Roadmap dan Nilai & Target serta akses ekspor/reset lokal. Jadwal, Vault dan search P1 hanya aktif setelah keputusan scope tercatat; Playbook dan Minat & Jalur adalah P2 dan hanya tampil aktif bila capability terkait diaktifkan. Pengelompokan Komunitas tetap bagian desain. Menu fitur nonaktif disembunyikan atau berlabel direncanakan, tanpa aksi aktif; bantuan lanjutan mengikuti capability, sedangkan petunjuk menjalankan demo tersedia pada README. | UX-AC-001, UX-AC-003 | UX-T-001, UX-T-003 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
+ | UX-BR-003 | Mengikuti FR | Hierarki angka: label jenis hasil → angka → coverage/provenance → action. Jangan menampilkan IPK prediksi tanpa label di area yang terbaca sebagai aktual. | UX-AC-002, UX-AC-009 | UX-T-002, UX-T-009 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
+ | UX-BR-004 | Mengikuti FR | Desain komponen: tombol utama satu per tindakan lokal, secondary untuk kembali/batal, destructive diberi konsekuensi konkret; penghapusan permanen melalui dialog AUTH. | UX-AC-004, UX-AC-006 | UX-T-004, UX-T-006 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
+ | UX-BR-005 | Mengikuti FR | Token semantik: canvas, surface, text-primary, text-muted, border, accent, success, warning, danger; status tidak dikodekan warna saja. Hex final diputus setelah contrast test. | UX-AC-008 | UX-T-008 | [PRD-09](../prd/PRD-09-design-system-navigation-and-ux.md) | Mengikuti FR aktif; belum diuji |
+@@ -270,7 +270,7 @@
+ | PUB-BR-003 | Mengikuti FR | FAQ wajib mencakup status independen; sumber nilai; actual vs simulasi; SSO/SLCM; perbedaan BRP; bobot tidak 100%; privasi/consent; restricted Drive; report materi; export/delete. | PUB-AC-004 | PUB-T-004 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Mengikuti FR aktif; belum diuji |
+ | PUB-BR-004 | Mengikuti FR | Tim pengembang: nama/peran/biografi singkat disetujui; foto/link portofolio opsional. Data yang belum diberikan diganti empty state, bukan identitas placeholder yang menyerupai orang nyata. | PUB-AC-006 | PUB-T-006 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Mengikuti FR aktif; belum diuji |
+ | PUB-BR-005 | Mengikuti FR | Contributor credit berasal dari VLT dan consent; tidak disalin manual ke daftar tim. Pencabutan kredit memperbarui apresiasi pada pembacaan berikutnya. | PUB-AC-007 | PUB-T-007 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Mengikuti FR aktif; belum diuji |
+-| PUB-BR-006 | Mengikuti FR | Kontak P0 adalah feedback internal; alamat organisasi atau kanal publik baru ditampilkan setelah pengguna memberikan dan menyetujui publikasinya. | PUB-AC-008 | PUB-T-008 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Mengikuti FR aktif; belum diuji |
++| PUB-BR-006 | Mengikuti FR | Kontak aplikasi berupa feedback internal adalah P2 melalui PUB-FR-008 dan SUP-FR-005; bukan dependency atau kewajiban tersembunyi P0. Alamat organisasi atau kanal publik hanya ditampilkan setelah pengguna memberikan dan menyetujui publikasinya. | PUB-AC-008 | PUB-T-008 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Mengikuti FR aktif; belum diuji |
+ | PUB-NFR-001 | P0 gate aktif | Seluruh aksi utama dapat diselesaikan dengan keyboard; fokus terlihat dan tidak terjebak. | PUB-AC-101 | PUB-T-101 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Gate untuk kemampuan aktif; lihat applicability bagian 15 PRD; belum diuji |
+ | PUB-NFR-002 | P0 gate aktif | Tampilan utama p95 ≤2 detik setelah data tersedia pada beban uji dasar. | PUB-AC-102 | PUB-T-102 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Gate untuk kemampuan aktif; lihat applicability bagian 15 PRD; belum diuji |
+ | PUB-NFR-003 | P0 gate aktif | Konten publik tidak pernah menyertakan data workspace dalam response/metadata. | PUB-AC-103 | PUB-T-103 | [PRD-11](../prd/PRD-11-public-pages-faq-and-team.md) | Gate untuk kemampuan aktif; lihat applicability bagian 15 PRD; belum diuji |
+@@ -285,7 +285,7 @@
+ | SUP-FR-009 | P2 | Preview isi/rentang data dan simpan consent notifikasi tersendiri | SUP-AC-009 | SUP-T-009 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Future Development; deferred |
+ | SUP-FR-010 | P2 | Beri label actual/projection/scenario, policy dan as-of | SUP-AC-010 | SUP-T-010 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Future Development; deferred |
+ | SUP-FR-011 | P2 | Tampilkan plain text tanpa eksekusi atau auto-fetch link | SUP-AC-011 | SUP-T-011 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Future Development; deferred |
+-| SUP-BR-001 | Mengikuti FR | P0 search corpus: published Course/CurriculumCourse, Topic dan Resource metadata. Tidak ada grade, nama pemilik akun, contribution raw, feedback atau isi Drive dalam global search. | SUP-AC-001 | SUP-T-001 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Mengikuti FR aktif; belum diuji |
++| SUP-BR-001 | Mengikuti FR | Saat search aktif (P1), corpus terdiri dari published Course/CurriculumCourse, Topic dan Resource metadata. Tidak ada grade, nama pemilik akun, contribution raw, feedback atau isi Drive dalam global search. | SUP-AC-001 | SUP-T-001 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Mengikuti FR aktif; belum diuji |
+ | SUP-BR-002 | Mengikuti FR | Normalisasi whitespace/case dan alias terkurasi; query literal tidak dieksekusi sebagai markup. Query 1–100 karakter; debounce usulan 300ms jika live, Enter selalu tersedia. | SUP-AC-001, SUP-AC-002 | SUP-T-001, SUP-T-002 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Mengikuti FR aktif; belum diuji |
+ | SUP-BR-003 | Mengikuti FR | Ranking deterministik exact code → title prefix → token title/topic → description; tie tipe course sebelum topic sebelum resource, lalu title dan stable ID. | SUP-AC-002 | SUP-T-002 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Mengikuti FR aktif; belum diuji |
+ | SUP-BR-004 | Mengikuti FR | Filter AND; per-page 20 hasil usulan. Scope izin diterapkan sebelum totals/pagination agar count tidak membocorkan draft. | SUP-AC-001, SUP-AC-003 | SUP-T-001, SUP-T-003 | [PRD-12](../prd/PRD-12-search-feedback-and-supporting-features.md) | Mengikuti FR aktif; belum diuji |
+@@ -326,3 +326,7 @@
+ ## Kaitan audit
+ 
+ Bukti administratif DDP1 memakai DDP-01–DDP-12 di Compliance Matrix; tidak dipalsukan sebagai fitur aplikasi. Ada 14 skenario integrasi, semuanya belum dieksekusi. P0/P1/P2 adalah prioritas rilis; bukan skor rubrik. Cabang tambahan dan bukti yang masih diperlukan dicatat pada Implementation Readiness.
++
++## Errata v0.2.1
++
++UX-BR-001/002, PUB-BR-006 dan SUP-BR-001 telah diselaraskan dengan FR serta capability manifest. Tidak ada FR, AC, test atau prioritas FR yang berubah. Journey hanya aktif sesuai label dan keputusan scope; lihat [errata](PRD-v0.2.1-ERRATA.md).
+--- v0.2/docs/00-governance/RESEARCH-AND-VALIDATION-REGISTER.md
++++ v0.2.1/docs/00-governance/RESEARCH-AND-VALIDATION-REGISTER.md
+@@ -1,6 +1,6 @@
+ # ORBIT — Research & Validation Register
+ 
+-Versi: **v0.2 DDP1 Draft** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
++Versi: **v0.2.1 DDP1 Errata** · Tanggal: **18 November 2026 (Asia/Jakarta)** · Owner: **Product Lead** · Status: untuk review manusia.
+ 
+ 
+ ## Audit konteks: known / assumed / unknown / external approval
+@@ -37,6 +37,7 @@
+ | SRC-13 | Primer: Python sqlite3 | https://docs.python.org/3/library/sqlite3.html | VERIFIED_OFFICIAL untuk dokumentasi teknologi | SQLite berbasis berkas tanpa server terpisah; ketersediaan modul runtime tim perlu diperiksa | 18 Nov 2026 |
+ | SRC-14 | Primer: Python unittest | https://docs.python.org/3/library/unittest.html | VERIFIED_OFFICIAL untuk dokumentasi teknologi | Test cases/fixtures/suites dan otomasi; belum ada test aplikasi Orbit | 18 Nov 2026 |
+ | SRC-15 | Primer: Streamlit | https://docs.streamlit.io/develop/concepts/architecture | VERIFIED_OFFICIAL untuk dokumentasi teknologi | Session state/forms/rerun; alternatif yang memerlukan penyesuaian UI/state | 18 Nov 2026 |
++| SRC-16 | Review dokumentasi independen yang dilampirkan pengguna | [ORBIT_Review_Independen_PRD_v0.2.md](https://chatgpt.com/library?file_id=libfile_2ba58f1dfc7481919f5d0044b9065870&account_id=personal); SHA-256 `b0045859cdc895a707487fadbaca13649c89ff61674444863a87bf00db00fade` | VERIFIED_SECONDARY untuk isi review; koreksi diperiksa langsung | Enam temuan prioritas/path/journey diverifikasi dan ditutup pada errata v0.2.1; bukan ketentuan dosen atau bukti test aplikasi. RV-14/15 dan kesiapan perangkat tetap open. | 18 Nov 2026 |
+ 
+ ### Catatan terbatas dari SRC-04
+ 
+--- v0.2/docs/prd/PRD-00-master-product-overview.md
++++ v0.2.1/docs/prd/PRD-00-master-product-overview.md
+@@ -4,13 +4,13 @@
+ 
+ | Field | Isi |
+ | --- | --- |
+-| ID / versi | PRD-00 / v0.2 DDP1 Draft |
++| ID / versi | PRD-00 / v0.2.1 DDP1 Errata |
+ | Status | Draft untuk review manusia; bukan bukti implementasi |
+ | Owner | Product Lead |
+ | Tanggal | 18 November 2026 (Asia/Jakarta) |
+ | Asumsi | Produk independen mahasiswa Fasilkom UI; Orbit masih placeholder; aturan DDP1 sudah diverifikasi melalui SRC-11; ketersediaan jam/kemampuan anggota belum diketahui (RV-14). |
+ | Acuan canon | [PRD-00](PRD-00-master-product-overview.md), [glossary](../00-governance/GLOSSARY-AND-DECISION-LOG.md) |
+-| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). |
++| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). v0.2.1: errata prioritas/journey dari review independen; FR dan ID tetap. |
+ 
+ ## 2. Executive Summary & Problem
+ 
+@@ -71,13 +71,15 @@
+ 
+ ## 6. Entry Points & User Journeys
+ 
++**Batas handoff arsitektur/implementasi:** hanya FR P0 beserta BR, NFR, AC dan test yang relevan untuk kemampuan aktif. P1/P2 serta subkemampuan future di dalam FR campuran tetap nonaktif sampai ada keputusan perubahan scope eksplisit dan tercatat. Journey berlabel future tidak menjadi kontrak coding P0.
++
+ Alur rilis DDP1 yang berlaku: Buka workspace sintetis → tambah dua offering → hitung BRP/target → simulasikan rencana → konfirmasi aktual per course → lihat dashboard. Satu kurikulum demo 6–12 course, satu term aktif, satu skenario; tidak wajib menyelesaikan seluruh visi produk. Alur lengkap di bawah disimpan untuk kemampuan yang prioritasnya sesuai bagian 5/8; bukan kewajiban menyelesaikan seluruhnya pada P0.
+ 
+-**J1.** Guest membaca status independen → membuat akun lokal → memilih profil minimal → menambahkan offering dan BRP → memasukkan nilai. Dashboard menampilkan kontribusi diketahui dan CTA isi data; menutup halaman lalu kembali mempertahankan data tersimpan.
+-
+-**J2.** Mahasiswa melihat pekan padat dan target → membaca alasan → membuka assessment sumber → mengubah rencana persiapan. Jika durasi kosong, ia melihat kelengkapan rendah dan dapat mengisi durasi tanpa mengisi nilai ulang.
+-
+-**J3.** Saat semester selesai, pengguna meninjau hasil aktual → closeout → roadmap diperbarui berdasarkan catatan aktual. Tawaran berbagi dapat dilewati; nilai tidak keluar dari workspace.
++**J1 — P0 aktif.** Buka workspace demo lokal → baca status independen/data sintetis → pilih profil minimal → tambahkan offering dan BRP → masukkan nilai. Dashboard membaca MAP/GRD langsung; menutup halaman lalu kembali mempertahankan data. Tidak ada langkah login. Varian produk lengkap yang membuat akun Orbit/login tetap disimpan sebagai P2, bukan precondition journey ini.
++
++**J2 — P2 / Future Development (SCH sederhana P1, guidance dan preparation blocks P2).** Mahasiswa melihat pekan padat dan target → membaca alasan → membuka assessment sumber → mengubah rencana persiapan. Jika durasi kosong, ia melihat kelengkapan rendah dan dapat mengisi durasi tanpa mengisi nilai ulang.
++
++**J3 — P2 / Future Development (Semester Closeout dan handover).** Saat semester selesai, pengguna meninjau hasil aktual → closeout → roadmap diperbarui berdasarkan catatan aktual. Tawaran berbagi dapat dilewati; nilai tidak keluar dari workspace.
+ 
+ ## 7. User Stories
+ 
+--- v0.2/docs/prd/PRD-09-design-system-navigation-and-ux.md
++++ v0.2.1/docs/prd/PRD-09-design-system-navigation-and-ux.md
+@@ -4,13 +4,13 @@
+ 
+ | Field | Isi |
+ | --- | --- |
+-| ID / versi | PRD-09 / v0.2 DDP1 Draft |
++| ID / versi | PRD-09 / v0.2.1 DDP1 Errata |
+ | Status | Draft untuk review manusia; bukan bukti implementasi |
+ | Owner | UX Lead / Accessibility Reviewer |
+ | Tanggal | 18 November 2026 (Asia/Jakarta) |
+ | Asumsi | Dua screenshot Figma telah diamati; interaksi, layer properties, responsivitas dan contrast belum diuji. Token di sini usulan konseptual. |
+ | Acuan canon | [PRD-00](PRD-00-master-product-overview.md), [glossary](../00-governance/GLOSSARY-AND-DECISION-LOG.md) |
+-| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). |
++| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). v0.2.1: errata prioritas/journey dari review independen; FR dan ID tetap. |
+ 
+ ## 2. Executive Summary & Problem
+ 
+@@ -56,13 +56,15 @@
+ 
+ ## 6. Entry Points & User Journeys
+ 
++**Batas handoff arsitektur/implementasi:** hanya FR P0 beserta BR, NFR, AC dan test yang relevan untuk kemampuan aktif. P1/P2 serta subkemampuan future di dalam FR campuran tetap nonaktif sampai ada keputusan perubahan scope eksplisit dan tercatat. Journey berlabel future tidak menjadi kontrak coding P0.
++
+ Alur rilis DDP1 yang berlaku: Workspace → dashboard → roadmap list atau Grade Rescue → hasil → dashboard. Warna, tipografi, orbit motif dan struktur visual baseline dipertahankan; hanya menu/capability aktif dibatasi. Alur lengkap di bawah disimpan untuk kemampuan yang prioritasnya sesuai bagian 5/8; bukan kewajiban menyelesaikan seluruhnya pada P0.
+ 
+-**J1.** User login → dashboard menampilkan semester aktif dan tindakan utama → pilih course → edit nilai → kembali dengan semester/filter tetap. Jika data kosong, CTA isi data menggantikan angka ilustrasi.
+-
+-**J2.** User keyboard membuka sidebar → pilih Roadmap → pilih tampilan list → buka detail → tutup dialog dengan Escape. Fokus kembali ke tombol pemicu; tidak perlu drag.
+-
+-**J3.** User mobile membuka global search → hasil berlabel tipe → pilih resource → kembali. Header tidak menutup content/focus; tabel punya tampilan list alternatif.
++**J1 — P0 aktif.** Buka workspace demo lokal → dashboard menampilkan semester aktif dan hasil MAP/GRD → pilih course → edit nilai → kembali dengan semester/filter tetap. Jika data kosong, CTA isi data menggantikan angka ilustrasi. Varian login akun Orbit tetap P2 dan tidak diperlukan pada P0.
++
++**J2 — P0 aktif.** User keyboard membuka sidebar → pilih Roadmap → pilih tampilan list → buka detail → tutup dialog dengan Escape. Fokus kembali ke tombol pemicu; tidak perlu drag.
++
++**J3 — P1 opsional, hanya bila search dan Vault diaktifkan.** User mobile membuka global search → hasil berlabel tipe → pilih resource → kembali. Header tidak menutup content/focus; tabel punya tampilan list alternatif.
+ 
+ ## 7. User Stories
+ 
+@@ -91,8 +93,8 @@
+ 
+ | ID | Aturan normatif produk | Diverifikasi melalui |
+ | --- | --- | --- |
+-| UX-BR-001 | Source visual hanya arah: Dashboard v2 terang, Roadmap v2 gelap. P0 memilih tema terang lintas halaman; P1 dark harus berlaku global dan diuji sendiri. | UX-FR-010, UX-FR-001 |
+-| UX-BR-002 | Navigasi primary: Ringkasan, Roadmap, Nilai & Target, Jadwal, Komunitas. Vault/Playbook berada di Komunitas; Minat & Jalur tampil bila P1 aktif. Pengaturan/Bantuan tetap tersedia. | UX-FR-001, UX-FR-003 |
++| UX-BR-001 | Source visual hanya arah: Dashboard v2 terang, Roadmap v2 gelap. P0 memilih tema terang lintas halaman; dark mode P2 harus berlaku global dan diuji sendiri, serta hanya tampil aktif bila capability tema gelap diaktifkan. | UX-FR-010, UX-FR-001 |
++| UX-BR-002 | Navigasi mengikuti capability manifest, bukan label prioritas saja. P0 menampilkan Ringkasan, Roadmap dan Nilai & Target serta akses ekspor/reset lokal. Jadwal, Vault dan search P1 hanya aktif setelah keputusan scope tercatat; Playbook dan Minat & Jalur adalah P2 dan hanya tampil aktif bila capability terkait diaktifkan. Pengelompokan Komunitas tetap bagian desain. Menu fitur nonaktif disembunyikan atau berlabel direncanakan, tanpa aksi aktif; bantuan lanjutan mengikuti capability, sedangkan petunjuk menjalankan demo tersedia pada README. | UX-FR-001, UX-FR-003 |
+ | UX-BR-003 | Hierarki angka: label jenis hasil → angka → coverage/provenance → action. Jangan menampilkan IPK prediksi tanpa label di area yang terbaca sebagai aktual. | UX-FR-002, UX-FR-009 |
+ | UX-BR-004 | Desain komponen: tombol utama satu per tindakan lokal, secondary untuk kembali/batal, destructive diberi konsekuensi konkret; penghapusan permanen melalui dialog AUTH. | UX-FR-004, UX-FR-006 |
+ | UX-BR-005 | Token semantik: canvas, surface, text-primary, text-muted, border, accent, success, warning, danger; status tidak dikodekan warna saja. Hex final diputus setelah contrast test. | UX-FR-008 |
+--- v0.2/docs/prd/PRD-11-public-pages-faq-and-team.md
++++ v0.2.1/docs/prd/PRD-11-public-pages-faq-and-team.md
+@@ -4,13 +4,13 @@
+ 
+ | Field | Isi |
+ | --- | --- |
+-| ID / versi | PRD-11 / v0.2 DDP1 Draft |
++| ID / versi | PRD-11 / v0.2.1 DDP1 Errata |
+ | Status | Draft untuk review manusia; bukan bukti implementasi |
+ | Owner | Content Owner / Product Lead |
+ | Tanggal | 18 November 2026 (Asia/Jakarta) |
+ | Asumsi | Nama anggota, kontak publik, biografi dan portofolio belum diberikan; jangan membuat identitas atau testimoni palsu. |
+ | Acuan canon | [PRD-00](PRD-00-master-product-overview.md), [glossary](../00-governance/GLOSSARY-AND-DECISION-LOG.md) |
+-| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). |
++| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). v0.2.1: errata prioritas/journey dari review independen; FR dan ID tetap. |
+ 
+ ## 2. Executive Summary & Problem
+ 
+@@ -94,7 +94,7 @@
+ | PUB-BR-003 | FAQ wajib mencakup status independen; sumber nilai; actual vs simulasi; SSO/SLCM; perbedaan BRP; bobot tidak 100%; privasi/consent; restricted Drive; report materi; export/delete. | PUB-FR-004 |
+ | PUB-BR-004 | Tim pengembang: nama/peran/biografi singkat disetujui; foto/link portofolio opsional. Data yang belum diberikan diganti empty state, bukan identitas placeholder yang menyerupai orang nyata. | PUB-FR-006 |
+ | PUB-BR-005 | Contributor credit berasal dari VLT dan consent; tidak disalin manual ke daftar tim. Pencabutan kredit memperbarui apresiasi pada pembacaan berikutnya. | PUB-FR-007 |
+-| PUB-BR-006 | Kontak P0 adalah feedback internal; alamat organisasi atau kanal publik baru ditampilkan setelah pengguna memberikan dan menyetujui publikasinya. | PUB-FR-008 |
++| PUB-BR-006 | Kontak aplikasi berupa feedback internal adalah P2 melalui PUB-FR-008 dan SUP-FR-005; bukan dependency atau kewajiban tersembunyi P0. Alamat organisasi atau kanal publik hanya ditampilkan setelah pengguna memberikan dan menyetujui publikasinya. | PUB-FR-008 |
+ 
+ **Draft copy yang dapat dipakai:** “Orbit membantu menyusun rencana semester, memantau nilai yang kamu masukkan, dan melihat beban tugas dalam satu tempat.” Subcopy: “Dikembangkan secara independen oleh mahasiswa. Bukan sistem resmi Universitas Indonesia.” CTA: “Mulai merencanakan”; secondary: “Lihat cara kerja”.
+ 
+--- v0.2/docs/prd/PRD-12-search-feedback-and-supporting-features.md
++++ v0.2.1/docs/prd/PRD-12-search-feedback-and-supporting-features.md
+@@ -4,13 +4,13 @@
+ 
+ | Field | Isi |
+ | --- | --- |
+-| ID / versi | PRD-12 / v0.2 DDP1 Draft |
++| ID / versi | PRD-12 / v0.2.1 DDP1 Errata |
+ | Status | Draft untuk review manusia; bukan bukti implementasi |
+ | Owner | Supporting Features Product Owner |
+ | Tanggal | 18 November 2026 (Asia/Jakarta) |
+ | Asumsi | P1 memakai pencarian metadata sederhana; tidak perlu full-text Drive, ML ranking, email atau push. |
+ | Acuan canon | [PRD-00](PRD-00-master-product-overview.md), [glossary](../00-governance/GLOSSARY-AND-DECISION-LOG.md) |
+-| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). |
++| Change log | v0.1 dipertahankan sebagai baseline; v0.2: audit DDP1, prioritas dan kontrak rilis direvisi terarah. Lihat [changelog](../00-governance/PRD-REVISION-CHANGELOG.md). v0.2.1: errata prioritas/journey dari review independen; FR dan ID tetap. |
+ 
+ ## 2. Executive Summary & Problem
+ 
+@@ -93,7 +93,7 @@
+ 
+ | ID | Aturan normatif produk | Diverifikasi melalui |
+ | --- | --- | --- |
+-| SUP-BR-001 | P0 search corpus: published Course/CurriculumCourse, Topic dan Resource metadata. Tidak ada grade, nama pemilik akun, contribution raw, feedback atau isi Drive dalam global search. | SUP-FR-001 |
++| SUP-BR-001 | Saat search aktif (P1), corpus terdiri dari published Course/CurriculumCourse, Topic dan Resource metadata. Tidak ada grade, nama pemilik akun, contribution raw, feedback atau isi Drive dalam global search. | SUP-FR-001 |
+ | SUP-BR-002 | Normalisasi whitespace/case dan alias terkurasi; query literal tidak dieksekusi sebagai markup. Query 1–100 karakter; debounce usulan 300ms jika live, Enter selalu tersedia. | SUP-FR-001, SUP-FR-002 |
+ | SUP-BR-003 | Ranking deterministik exact code → title prefix → token title/topic → description; tie tipe course sebelum topic sebelum resource, lalu title dan stable ID. | SUP-FR-002 |
+ | SUP-BR-004 | Filter AND; per-page 20 hasil usulan. Scope izin diterapkan sebelum totals/pagination agar count tidak membocorkan draft. | SUP-FR-001, SUP-FR-003 |

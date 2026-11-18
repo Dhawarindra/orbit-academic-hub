@@ -1,0 +1,216 @@
+{
+  "package": "ORBIT Modular PRD — DDP1 Revision & Audit",
+  "version": "v0.2.1 DDP1 Errata",
+  "date": "2026-11-18",
+  "timezone": "Asia/Jakarta",
+  "status": "CONDITIONAL GO for architecture; documentation errata only, no application code or application tests",
+  "baseline": "v0.1 Draft; all original IDs retained",
+  "official_source": {
+    "filename": "Panduan Proyek Kelompok DDP1 Gasal 26_27.docx.pdf",
+    "version": 1,
+    "pages_reviewed": 5,
+    "sha256": "16d64e6c23b6c601e028232f97c298228a07175911f3b0570132c1c1810a49f5"
+  },
+  "counts": {
+    "preserved_FR": 141,
+    "preserved_BR": 102,
+    "preserved_NFR": 39,
+    "preserved_AC": 180,
+    "preserved_T": 180,
+    "preserved_US": 43,
+    "prd_count": 13,
+    "FR": 143,
+    "BR": 102,
+    "NFR": 39,
+    "AC": 182,
+    "primary_tests": 182,
+    "integration_tests": 14,
+    "FR_priorities": {
+      "P1": 27,
+      "P0": 48,
+      "P2": 68
+    },
+    "rtm_requirement_rows": 284,
+    "relative_links_checked": 452,
+    "priority_changes": 91,
+    "behavior_changes": 34,
+    "reference_arithmetic_checks_passed": 12,
+    "errors": []
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3970,
+      "sha256": "0779387f4ecac3be69d238e83ae5c14a0488dd4aac78e0eac48af0f2e3df884a"
+    },
+    {
+      "path": "docs/00-governance/DDP1-COMPLIANCE-MATRIX.md",
+      "bytes": 10752,
+      "sha256": "db7372f89a1b289a0300d4b4df89abc8ee434be2b3ca6d8558558689e9999304"
+    },
+    {
+      "path": "docs/00-governance/GLOSSARY-AND-DECISION-LOG.md",
+      "bytes": 15024,
+      "sha256": "b164f9005548c4a2b61b74e86129414b8d636ae3fa92966728f31370daea8fd6"
+    },
+    {
+      "path": "docs/00-governance/IMPLEMENTATION-READINESS-REPORT.md",
+      "bytes": 21296,
+      "sha256": "3459cd8f842d89bb12920bb45f171d6901f40ec185c40bbbcd4685e25051ff52"
+    },
+    {
+      "path": "docs/00-governance/MVP-SCOPE-AND-PRIORITIES.md",
+      "bytes": 20692,
+      "sha256": "e36817b6ee5e9394b27d587b31ee9f3c9330758807334bf6255f670fee9f478a"
+    },
+    {
+      "path": "docs/00-governance/PRD-AUDIT-REPORT.md",
+      "bytes": 31569,
+      "sha256": "6fe149798304b4dfc76f88667792f93359f99f4e11aca81d8950eab92f9a7845"
+    },
+    {
+      "path": "docs/00-governance/PRD-REVISION-CHANGELOG.md",
+      "bytes": 40149,
+      "sha256": "c5472737a191a5ec70962ffb7deee2a025a050d78c860a892ecbccfad38aa35b"
+    },
+    {
+      "path": "docs/00-governance/PRD-v0.1-to-v0.2.patch",
+      "bytes": 483591,
+      "sha256": "1cd88d53d87a775941a639331bfb8b6cbc546b88627a7fc00dbb338a6264a706"
+    },
+    {
+      "path": "docs/00-governance/PRD-v0.2-to-v0.2.1.patch",
+      "bytes": 47658,
+      "sha256": "8fb290f6378b7b6703d54d3c539db31002d3b66af79fd305f5c2dcd41580e19f"
+    },
+    {
+      "path": "docs/00-governance/PRD-v0.2.1-ERRATA.md",
+      "bytes": 8074,
+      "sha256": "9728d1de26f08aab97d32f87b2c1cc701e4aec27c62c4ee693a728bd683e1a29"
+    },
+    {
+      "path": "docs/00-governance/PRODUCT-DOC-INDEX.md",
+      "bytes": 6740,
+      "sha256": "61fe88941e56d6e06bb31fb45fb3542203a066fccaf0752ecdfa0c62bb617614"
+    },
+    {
+      "path": "docs/00-governance/QA-DOCUMENTATION-REPORT.md",
+      "bytes": 10324,
+      "sha256": "f263c8c577352b6c06b4c46d52b8e2032f6c23d3abe276ef0b99adf767d936cb"
+    },
+    {
+      "path": "docs/00-governance/REQUIREMENTS-TRACEABILITY-MATRIX.md",
+      "bytes": 81519,
+      "sha256": "d879e040429b8a009739b87b5ad09f0aa4865789d4375aef2a4e69d3eac8d2bd"
+    },
+    {
+      "path": "docs/00-governance/RESEARCH-AND-VALIDATION-REGISTER.md",
+      "bytes": 13936,
+      "sha256": "a18969881612e940c52c0d1a3b0594e97a6158418cc033071c1b4c65fcb5a5ad"
+    },
+    {
+      "path": "docs/prd/PRD-00-master-product-overview.md",
+      "bytes": 26818,
+      "sha256": "92e37c97baaa830c454b2ca7977ee031eef255aa6dffe5bf79d763a1aea7f9cd"
+    },
+    {
+      "path": "docs/prd/PRD-01-academic-profile-and-onboarding.md",
+      "bytes": 23069,
+      "sha256": "220f362e76ce4aff9f408f352098ec133c48c3c8498f6507b4828d35133899bb"
+    },
+    {
+      "path": "docs/prd/PRD-02-roadmap-and-semester-simulator.md",
+      "bytes": 26570,
+      "sha256": "ea8053fefe78f209ddde45d72a68dc0eb4432beb899577703169f840c28acef3"
+    },
+    {
+      "path": "docs/prd/PRD-03-grade-rescue-and-gpa-engine.md",
+      "bytes": 34866,
+      "sha256": "0adcd392fae86b040c09d28ee2c1369fd94660996dd49e5ea5b1bb101a12b649"
+    },
+    {
+      "path": "docs/prd/PRD-04-schedule-and-stress-radar.md",
+      "bytes": 25438,
+      "sha256": "e741aea252038c077a08ff97e9b95f700ffb71c434929370f98d1ec6e5cf7df3"
+    },
+    {
+      "path": "docs/prd/PRD-05-senior-playbook-and-insights.md",
+      "bytes": 23254,
+      "sha256": "9ec59b49d731bf3aec180d346caebac6fd3db614ea4846875c95da587b1d909e"
+    },
+    {
+      "path": "docs/prd/PRD-06-knowledge-vault-and-contributors.md",
+      "bytes": 25100,
+      "sha256": "cc75242cbd86b9e38108d4b67c3d8f94dd1c5a96d6ec6386a14d99fb3b8d299c"
+    },
+    {
+      "path": "docs/prd/PRD-07-career-to-course-navigator.md",
+      "bytes": 20129,
+      "sha256": "1a88bf00c2d53072f759f0e527b4fb73f8da0717c0b48fab1cc5e3dba9e027ac"
+    },
+    {
+      "path": "docs/prd/PRD-08-guidance-engine-and-semester-closeout.md",
+      "bytes": 23795,
+      "sha256": "2873bdc20506917dc551d2dc6ba26338d5a89845afc0b9c15d5878cb1b2bc63f"
+    },
+    {
+      "path": "docs/prd/PRD-09-design-system-navigation-and-ux.md",
+      "bytes": 24771,
+      "sha256": "8bdf678bb4e3e4d6e4e8f7e59b256dcc4d6e5bcc374b6f65d7d37aa897416945"
+    },
+    {
+      "path": "docs/prd/PRD-10-authentication-privacy-and-integrations.md",
+      "bytes": 31486,
+      "sha256": "139e8b531db05f58d92e5d3526e85bb4a3d127344b9510389cf427759e9df4db"
+    },
+    {
+      "path": "docs/prd/PRD-11-public-pages-faq-and-team.md",
+      "bytes": 21649,
+      "sha256": "379e558ee4caa40f52b55a790446cdeccc12e67fdb0aec33490ce188a3b73e52"
+    },
+    {
+      "path": "docs/prd/PRD-12-search-feedback-and-supporting-features.md",
+      "bytes": 24941,
+      "sha256": "159e0d7a2df549219e81fdf1e04092894835fb56d3861e69f68a3aa36aa84b38"
+    }
+  ],
+  "archive_root": "ORBIT_PRD_v0.2.1",
+  "errata_review": {
+    "filename": "ORBIT_Review_Independen_PRD_v0.2.md",
+    "sha256": "b0045859cdc895a707487fadbaca13649c89ff61674444863a87bf00db00fade",
+    "source_id": "SRC-16",
+    "findings": 6
+  },
+  "errata_validation": {
+    "baseline_version": "v0.2 DDP1 Draft",
+    "version": "v0.2.1 DDP1 Errata",
+    "review_findings_closed_in_documentation": 6,
+    "changed_business_rules": [
+      "UX-BR-001",
+      "UX-BR-002",
+      "PUB-BR-006",
+      "SUP-BR-001"
+    ],
+    "changed_PRDs": [
+      "PRD-00-master-product-overview.md",
+      "PRD-09-design-system-navigation-and-ux.md",
+      "PRD-11-public-pages-faq-and-team.md",
+      "PRD-12-search-feedback-and-supporting-features.md"
+    ],
+    "unchanged_PRDs": 9,
+    "FR": 143,
+    "FR_priorities": {
+      "P0": 48,
+      "P1": 27,
+      "P2": 68
+    },
+    "BR": 102,
+    "NFR": 39,
+    "AC": 182,
+    "primary_tests": 182,
+    "integration_tests": 14,
+    "relative_links_checked_before_QA_append": 452,
+    "application_tests_run": false,
+    "errors": []
+  }
+}
