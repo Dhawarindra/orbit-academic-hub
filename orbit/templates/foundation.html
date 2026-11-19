@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="hero">
+  <div class="hero-copy"><p class="eyebrow">Orbit Academic Hub</p><h1>Grade <em>Rescue.</em></h1>
+  <p>Hitung posisi nilai saat ini dan cari tahu skor yang kamu perlukan untuk mencapai target.</p>
+  <div class="actions"><a class="button light" href="{{ url_for('grades.index') }}">Buka Grade Rescue <span aria-hidden="true">→</span></a>
+  <a class="hero-link" href="{{ url_for('grades.new', example=1) }}">Coba contoh sintetis</a></div></div>
+  <div class="orbit-art" aria-hidden="true"><i></i><i></i><i></i><b>∑</b></div>
+</div>
+<div class="intro-grid">
+  <section class="panel home-card"><h2>Struktur penilaian</h2><p>Susun bobot kuis, tugas, UTS, dan UAS sesuai rencana kelas. Komponen dapat memiliki subkomponen.</p><a href="{{ url_for('grades.new') }}">Tambah mata kuliah →</a></section>
+  <section class="panel home-card"><h2>Contoh perhitungan</h2><p>Kuis dan UTS menyumbang 36 poin dari 50% bobot terisi. Untuk target akhir 75, skor UAS yang diperlukan adalah 78 dari 100.</p><a href="{{ url_for('grades.new',example=1) }}">Buka struktur contoh →</a></section>
+</div>
+{% endblock %}

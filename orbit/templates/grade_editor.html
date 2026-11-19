@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% from "grade_forms.html" import meta, alert with context %}
+{% block title %}Struktur penilaian · Orbit Academic Hub{% endblock %}
+{% block main %}
+<p class="crumb"><a href="{{ url_for('grades.index') }}">Grade Rescue</a> / Struktur penilaian</p>
+<div class="page-head"><div><h1>{{ 'Edit struktur penilaian' if course else 'Tambah mata kuliah' }}</h1><p>Atur bobot menurut rencana penilaian kelas. Gunakan data sintetis.</p></div></div>
+{{ alert(error) }}
+<form method="post" novalidate>
+{{ meta(state, request.method=='POST') }}
+<button type="submit" name="edit" value="save" hidden>Simpan struktur</button>
+<section class="panel"><h2>{{ course.name if course else 'Detail mata kuliah' }}</h2>
+{% if course %}<p>{{ course.term }} · BRP versi {{ course.version_no }}</p>{% else %}
+<div class="grid3"><label>Nama mata kuliah<input name="name" value="{{ values.name }}" placeholder="Mis. Dasar Pemrograman" maxlength="100" required></label>
+<label>Periode<input name="term" value="{{ values.term }}" placeholder="Mis. Ganjil 2026" maxlength="100" required></label>
+<label>Kelas (opsional)<input name="class_name" value="{{ values.class_name }}" placeholder="Mis. A" maxlength="100"></label></div>
+<label class="check"><input type="checkbox" name="policy" value="demo" {% if values.policy=='demo' %}checked{% endif %}> Gunakan contoh kebijakan huruf sintetis untuk kelas ini (A ≥ 85, B ≥ 70, C di bawah 70).</label>{% endif %}
+</section>
+<section class="panel"><h2>Komponen penilaian</h2><p>Bobot setiap kelompok berjumlah 100%. Untuk subkomponen gunakan jalur seperti <b>Kuis / Q1</b> dan sertakan baris induk <b>Kuis</b>. Kosongkan maksimum, langkah, dan skor pada baris induk.</p>
+{% for r in entries %}<fieldset class="component"><legend>Komponen {{ loop.index }}</legend><div class="row-fields">
+<label>Nama / jalur<input name="path" value="{{ r.path }}" maxlength="240" placeholder="UTS"></label>
+<label>Bobot (%)<input name="weight" value="{{ r.weight }}" inputmode="decimal"></label>
+<label>Maksimum<input name="maximum" value="{{ r.maximum }}" inputmode="decimal"></label>
+<label>Langkah skor<input name="quantum" value="{{ r.quantum }}" inputmode="decimal"></label>
+<label>Skor aktual<input name="earned" value="{{ r.earned }}" inputmode="decimal" placeholder="Belum ada"></label>
+<button class="text-btn" name="edit" value="remove:{{ loop.index0 }}" aria-label="Hapus komponen {{ loop.index }}">Hapus</button></div></fieldset>{% endfor %}
+<button class="secondary" name="edit" value="add">+ Tambah baris</button>
+<label>Aturan tambahan di luar perhitungan linear (opsional)<input name="rule_note" maxlength="300" placeholder="Mis. minimum skor ujian" value="{{ form.get('rule_note', rules|join(', ')) }}"></label>
+<p class="hint">Langkah skor menentukan pembulatan ke atas untuk target, misalnya 1 atau 0,01. Simpan skor pertama untuk mengunci struktur. Batas input: 16 tingkat, 24 digit, 12 desimal, dan 2 desimal untuk bobot.</p>
+</section><div class="actions"><button class="button" name="edit" value="save">Simpan struktur</button><a href="{{ url_for('grades.detail',course_id=course.id) if course else url_for('grades.index') }}">Batal</a></div></form>
+{% endblock %}

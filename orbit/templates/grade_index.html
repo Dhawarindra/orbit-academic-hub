@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Grade Rescue · Orbit Academic Hub{% endblock %}
+{% block main %}
+<p class="crumb"><a href="/">Beranda</a> / Grade Rescue</p>
+<div class="page-head"><div><h1>Grade Rescue</h1><p>Kelola komponen penilaian dan uji target per mata kuliah.</p></div>
+<a class="button" href="{{ url_for('grades.new') }}">+ Tambah mata kuliah</a></div>
+<section class="panel"><div class="section-head"><h2>Mata kuliah saya</h2><span class="count">{{ courses|length }}</span></div>
+{% for c in courses %}<a class="course-row" href="{{ url_for('grades.detail', course_id=c.id) }}"><span><b>{{ c.name }}</b><small>{{ c.term }}{% if c.class_name %} · {{ c.class_name }}{% endif %}</small></span><span aria-hidden="true">→</span></a>
+{% else %}<div class="empty"><span class="empty-mark" aria-hidden="true">∑</span><div><h3>Belum ada mata kuliah</h3><p>Mulai dengan struktur penilaian sendiri atau buka contoh kuis, UTS, dan UAS.</p><a href="{{ url_for('grades.new', example=1) }}">Buka formulir contoh →</a></div></div>{% endfor %}</section>
+{% endblock %}
