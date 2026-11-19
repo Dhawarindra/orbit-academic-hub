@@ -21,7 +21,7 @@ def check_database(path: Path) -> None:
         with open_database(path) as connection:
             connection.execute("BEGIN IMMEDIATE")
             version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if version not in (0, 1):
+            if version not in (0, 1, 2):
                 raise ValueError("Unsupported SQLite schema version.")
             if connection.execute("PRAGMA quick_check(1)").fetchone()[0] != "ok":
                 raise ValueError("SQLite integrity check failed.")
@@ -35,6 +35,13 @@ def check_database(path: Path) -> None:
                     (uuid4().hex, uuid4().hex),
                 )
                 connection.execute("PRAGMA user_version=1")
+            if version < 2:
+                schema = Path(__file__).with_name("roadmap.sql").read_text(encoding="utf-8")
+                for statement in schema.split(";"):
+                    if statement.strip():
+                        connection.execute(statement)
+                connection.execute("UPDATE workspace SET schema_version=2")
+                connection.execute("PRAGMA user_version=2")
             connection.execute("COMMIT")
     except (OSError, sqlite3.Error) as error:
         raise ValueError(

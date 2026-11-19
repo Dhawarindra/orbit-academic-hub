@@ -53,7 +53,7 @@ def command(path, form, action, course_id, writer):
             raise Conflict("Data berubah sejak halaman dibuka. Tinjau versi terbaru lalu ulangi.")
         result = writer(db, state)
         revision = state["state_revision"] + 1
-        source_rev = state["source_revision"] + int(action not in ("simulation", "reset"))
+        source_rev = state["source_revision"] + int(action not in ("simulation", "roadmap-plan", "reset"))
         db.execute("UPDATE workspace SET state_revision=?,source_revision=?", (revision, source_rev))
         db.execute("""INSERT INTO change_log(event_id,epoch,owner_scope,state_revision,source_revision,
                       entity_id,event_type) VALUES(?,?,?,?,?,?,?)""",
@@ -183,12 +183,31 @@ def stale(scenario_row, state):
         state["epoch"], state["source_revision"])
 
 
-def save_overlay(db, state, values, course_id, target="", reset=False):
+def save_scenario(db, state, changes, reset=False):
+    """One aggregate shared by both modules. A reset clears all four overlay fields."""
     old = scenario(db)
     if not reset and stale(old, state):
         raise Conflict("Sumber simulasi berubah. Reset simulasi sebelum mengisi asumsi baru.")
-    overlay = {} if reset or not old else json.loads(old["score_overlay"])
-    targets = {} if reset or not old else json.loads(old["target_overlay"])
+    fields = ("score_overlay", "target_overlay", "plan", "assumptions")
+    payload = {field: old[field] if old and not reset else "{}" for field in fields}
+    payload.update({field: json.dumps(value) for field, value in changes.items()})
+    db.execute("""INSERT INTO scenario(singleton,scenario_id,owner_scope,base_epoch,base_source_revision,
+                  scenario_revision,score_overlay,target_overlay,plan,assumptions) VALUES(1,?,?,?,?,1,?,?,?,?)
+                  ON CONFLICT(singleton) DO UPDATE SET base_epoch=excluded.base_epoch,
+                  base_source_revision=excluded.base_source_revision,scenario_revision=scenario_revision+1,
+                  score_overlay=excluded.score_overlay,target_overlay=excluded.target_overlay,
+                  plan=excluded.plan,assumptions=excluded.assumptions""",
+               (uuid4().hex, state["owner_scope"], state["epoch"], state["source_revision"],
+                *(payload[field] for field in fields)))
+
+
+def save_overlay(db, state, values, course_id, target="", reset=False):
+    if reset:
+        save_scenario(db, state, {}, reset=True)
+        return
+    old = scenario(db)
+    overlay = json.loads(old["score_overlay"]) if old else {}
+    targets = json.loads(old["target_overlay"]) if old else {}
     if target:
         targets[course_id] = target
     else:
@@ -198,11 +217,7 @@ def save_overlay(db, state, values, course_id, target="", reset=False):
             overlay.pop(key, None)
         else:
             overlay[key] = value
-    db.execute("""INSERT INTO scenario(singleton,scenario_id,owner_scope,base_epoch,base_source_revision,
-                  scenario_revision,score_overlay,target_overlay) VALUES(1,?,?,?,?,1,?,?) ON CONFLICT(singleton) DO UPDATE SET
-                  base_epoch=excluded.base_epoch,base_source_revision=excluded.base_source_revision,
-                  scenario_revision=scenario_revision+1,score_overlay=excluded.score_overlay,target_overlay=excluded.target_overlay""",
-               (uuid4().hex, state["owner_scope"], state["epoch"], state["source_revision"], json.dumps(overlay), json.dumps(targets)))
+    save_scenario(db, state, {"score_overlay": overlay, "target_overlay": targets})
 
 
 def bound_policy(row):

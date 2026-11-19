@@ -1,6 +1,6 @@
 # Orbit Academic Hub
 
-Orbit adalah proyek independen mahasiswa DDP1, Fakultas Ilmu Komputer Universitas Indonesia. **Grade Rescue** sudah dapat digunakan untuk mencatat komponen penilaian, menghitung target dan mencoba skenario pada data sintetis. Academic Roadmap masih direncanakan.
+Orbit adalah proyek independen mahasiswa DDP1, Fakultas Ilmu Komputer Universitas Indonesia. **Grade Rescue** mencatat penilaian dan menghitung target. **Academic Roadmap** membaca hasil final terkonfirmasi untuk mengevaluasi prasyarat dan menyimulasikan rencana semester pada katalog sintetis.
 
 ## Menjalankan dari checkout baru
 
@@ -38,6 +38,16 @@ Buka `http://127.0.0.1:5000/` di browser pada perangkat yang menjalankan server,
 3. Di **Simulasi what-if**, masukkan UAS 90 untuk melihat proyeksi 81. Skor UAS aktual tetap kosong. Perubahan sumber membuat simulasi lama perlu direset.
 4. Untuk mencatat hasil final yang dilaporkan, buka **Catat hasil final**, isi hasil dan sumber sintetis, lalu tinjau sebelum konfirmasi. Koreksi berikutnya menyimpan riwayat dan memerlukan alasan.
 
+### Mencoba Academic Roadmap
+
+Buka `http://127.0.0.1:5000/roadmap/` lalu pilih **Gunakan katalog contoh**. Katalog A–C memakai SKS, rantai prasyarat, dan asumsi penawaran dari PRD-02 §9. Data untuk katalog lengkap A–H masih memerlukan keputusan fixture OD-02.
+
+1. Buka detail Demo B untuk membaca alasan kelayakan. Pada katalog baru, hasil aktual A belum diketahui.
+2. Pada simulator, pilih semester 1, 2, dan 3 untuk A, B, dan C. Tandai asumsi lulus untuk A dan B, lalu tunda A ke semester 2. Dengan penawaran setiap semester, hasil bersyarat adalah A2, B3, dan C4.
+3. Di **Pengambilan aktual**, hubungkan pengambilan Grade Rescue ke Demo A. Konfirmasi hasil final lulus di Grade Rescue untuk memenuhi syarat Demo B. Perubahan sumber membuat skenario perlu ditinjau. **Reset skenario bersama** menghapus rencana dan simulasi Grade Rescue. Pengambilan dan hasil final terkonfirmasi tetap tersimpan.
+
+Kurator dapat memvalidasi dan mengaktifkan file JSON sintetis lokal dengan `python -m flask --app orbit roadmap activate-catalog PATH.json` dari environment aplikasi. Format contoh ada di `orbit/repositories/roadmap_demo.json`. Aktivasi yang gagal menampilkan alasan dan mempertahankan versi aktif.
+
 ## Konfigurasi dan SQLite
 
 | Variabel | Default | Penggunaan |
@@ -46,7 +56,7 @@ Buka `http://127.0.0.1:5000/` di browser pada perangkat yang menjalankan server,
 | `ORBIT_PORT` | `5000` | Port lokal 1–65535. Jika port sibuk, pilih port lain dan sesuaikan URL browser. |
 | `ORBIT_HOST` | `127.0.0.1` | Runner M0 hanya menerima alamat loopback IPv4 ini. |
 
-Untuk database contoh terpisah di PowerShell, gunakan `$env:ORBIT_DATABASE = Join-Path $env:TEMP "orbit-grade-demo.sqlite3"`. Di Bash gunakan `export ORBIT_DATABASE=/tmp/orbit-grade-demo.sqlite3`. Startup memeriksa integritas dan menyiapkan skema Grade Rescue versi 1 dalam satu transaksi pada database versi 0 milik M0. File lama tidak perlu dihapus. Jika pemeriksaan gagal, simpan file lama dan periksa path, izin, atau pilih file demo baru.
+Untuk database contoh terpisah di PowerShell, gunakan `$env:ORBIT_DATABASE = Join-Path $env:TEMP "orbit-grade-demo.sqlite3"`. Di Bash gunakan `export ORBIT_DATABASE=/tmp/orbit-grade-demo.sqlite3`. Startup memeriksa integritas dan memigrasikan SQLite secara transaksional dari M0 melalui skema Grade Rescue v1 ke skema Roadmap v2. Pemilihan katalog dan kaitan pengambilan dilakukan secara eksplisit. Jika pemeriksaan gagal, simpan file lama dan periksa path, izin, atau pilih file demo baru.
 
 Mode debug dan reloader dinonaktifkan. Konfigurasi `FLASK_DEBUG=1` ditolak. Gunakan runner modul di atas. Aplikasi membuat kunci penandatanganan lokal di `instance/` untuk melindungi formulir dan konfirmasi. Direktori ini diabaikan Git. Gunakan hanya data sintetis.
 
@@ -55,7 +65,8 @@ Mode debug dan reloader dinonaktifkan. Konfigurasi `FLASK_DEBUG=1` ditolak. Guna
 | Lokasi | Peran |
 | --- | --- |
 | `orbit/__init__.py`, `__main__.py`, `config.py` | Membuat aplikasi, membaca konfigurasi, dan menjalankan server lokal. |
-| `orbit/web/` | Pemeriksaan request lokal, proteksi formulir, dan route Grade Rescue. |
+| `orbit/web/` | Pemeriksaan request lokal, proteksi formulir, dan route Grade Rescue serta Roadmap. |
+| `orbit/domain/roadmap.py`, `orbit/services/academic_roadmap.py` | Validasi katalog, evaluasi prasyarat, pengambilan terikat versi, dan skenario semester. |
 | `orbit/domain/grades.py`, `orbit/services/gradebook.py` | Validasi dan perhitungan presisi penuh, transaksi nilai, serta isolasi simulasi. |
 | `orbit/templates/`, `orbit/static/` | Template Jinja dan CSS lokal. |
 | `orbit/repositories/` | Membuka, memeriksa, dan menutup koneksi SQLite. |
@@ -73,12 +84,14 @@ Dari root checkout dengan virtual environment aktif:
 python -m unittest discover -s tests -v
 ```
 
+Untuk uji keyboard dan pemulihan koneksi di Chromium, jalankan `python tests/browser_roadmap.py` memakai interpreter yang memiliki Playwright. Jika Flask memakai interpreter terpisah seperti di Codex Cloud, jalankan `ORBIT_APP_PYTHON=/workspace/.orbit-venv/bin/python python tests/browser_roadmap.py`. Skrip membuka server loopback dan SQLite sementara.
+
 Di PowerShell tanpa aktivasi, gunakan `.\.venv\Scripts\python.exe -m unittest discover -s tests -v`. Di Linux gunakan `.venv/bin/python`, atau di cloud gunakan `/workspace/.orbit-venv/bin/python`, dengan argumen yang sama. Tes memakai database sementara terpisah. Runtime referensi cloud adalah Linux, Python 3.12.14, Flask 3.1.3, Jinja 3.1.6, dan SQLite 3.53.1. Reproduksi di perangkat anggota dan teach-back anggota kedua berstatus **PENDING**.
 
 ## Jejak keputusan M0
 
 Otorisasi awal mencakup fondasi M0 dengan Flask/Jinja dan SQLite. Baseline produk adalah PRD v0.2.1 dan rancangan teknis v0.1. Target perencanaan tim adalah sekitar 8 dari 94 jam-orang untuk M0. Build Phase 1 mengotorisasi Grade Rescue sebagai fitur pertama.
 
-`CORE-FR-008` → `CORE-AC-008` → `CORE-T-008` mengharuskan perubahan scope dapat ditelusuri hingga keputusan dan pengujian terkait. Contoh baseline: keputusan D-21 membatasi `MAP-FR-006` pada tinjau perubahan dan reset/pilih ulang. Rebase yang mempertahankan pilihan ditunda ke P2. Pengujian dokumentasi menelusuri keputusan, changelog, dan pasangan `MAP-AC-006` / `MAP-T-006`. Hasilnya memeriksa jejak dokumen. Perilaku aplikasi Roadmap menunggu implementasi.
+`CORE-FR-008` → `CORE-AC-008` → `CORE-T-008` mengharuskan perubahan scope dapat ditelusuri hingga keputusan dan pengujian terkait. Contoh baseline: keputusan D-21 membatasi `MAP-FR-006` pada tinjau perubahan dan reset/pilih ulang. Rebase yang mempertahankan pilihan ditunda ke P2. Pengujian dokumentasi menelusuri keputusan, changelog, dan pasangan `MAP-AC-006` / `MAP-T-006`.
 
 [Decision log](ORBIT_PRD_v0.2.1/docs/00-governance/GLOSSARY-AND-DECISION-LOG.md) · [Changelog](ORBIT_PRD_v0.2.1/docs/00-governance/PRD-REVISION-CHANGELOG.md) · [Traceability matrix](ORBIT_PRD_v0.2.1/docs/00-governance/REQUIREMENTS-TRACEABILITY-MATRIX.md) · [Instruksi kontributor](AGENTS.md)

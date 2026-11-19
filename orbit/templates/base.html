@@ -13,6 +13,7 @@
   <nav aria-label="Navigasi utama">
     <a href="{{ url_for('foundation.home') }}" {% if request.blueprint=='foundation' %}aria-current="page"{% endif %}>Beranda</a>
     <a href="{{ url_for('grades.index') }}" {% if request.blueprint=='grades' %}aria-current="page"{% endif %}>Grade Rescue</a>
+    <a href="{{ url_for('roadmap.index') }}" {% if request.blueprint=='roadmap' %}aria-current="page"{% endif %}>Academic Roadmap</a>
   </nav>
   <span class="demo"><i aria-hidden="true"></i>Demo sintetis</span>
 </div></header>

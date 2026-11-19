@@ -42,9 +42,9 @@ def helpers():
     return dict(operation_id=lambda: uuid4().hex, fmt=display)
 
 
-@grades.before_request
+@grades.before_app_request
 def csrf_check():
-    if request.method == "POST":
+    if request.method == "POST" and request.blueprint in ("grades", "roadmap"):
         token = session.get("csrf")
         if not token or not hmac.compare_digest(request.form.get("csrf", "").encode(), token.encode()):
             abort(403, "Formulir kedaluwarsa. Muat ulang halaman.")

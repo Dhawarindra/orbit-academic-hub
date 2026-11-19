@@ -9,6 +9,7 @@ from .domain.grades import exact_score
 from .repositories.sqlite_store import check_database
 from .web.routes import foundation
 from .web.grades import grades, signing_key
+from .web.roadmap import roadmap
 
 
 def create_app() -> Flask:
@@ -19,5 +20,6 @@ def create_app() -> Flask:
     app.config.update(SESSION_COOKIE_SAMESITE="Strict", MAX_CONTENT_LENGTH=1024 * 1024)
     app.register_blueprint(foundation)
     app.register_blueprint(grades)
+    app.register_blueprint(roadmap)
     app.add_template_filter(exact_score)
     return app
