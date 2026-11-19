@@ -1,0 +1,56 @@
+{% extends "base.html" %}{% from "grade_forms.html" import meta, alert with context %}
+{% block title %}{{ course.name }} · Grade Rescue{% endblock %}
+{% macro post(action_name) %}{{ url_for('grades.update', course_id=course.id, action=action_name) }}{% endmacro %}
+{% block main %}
+<p class="crumb"><a href="{{ url_for('grades.index') }}">Grade Rescue</a> / {{ course.term }}</p>
+<div class="page-head"><div><h1>{{ course.name }}</h1><p>{{ course.term }}{% if course.class_name %} · Kelas {{ course.class_name }}{% endif %} · BRP pribadi v{{ course.version_no }} · Sumber manual sintetis</p></div>
+<a class="secondary" href="{{ url_for('grades.index') }}">Semua mata kuliah</a></div>
+{{ alert(error) }}
+{% for message in get_flashed_messages() %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+{% if rules %}<p class="alert">Hasil hanya numerik. Aturan yang belum dihitung: {{ rules|join(', ') }}.</p>{% endif %}
+<div class="metrics" aria-label="Ringkasan skor aktual">
+<div><small>Rerata teramati</small><strong>{{ fmt(actual.average) if actual.average is not none else '—' }}</strong><span>{% if actual.average is none %}Belum ada bobot terisi{% else %}Dari komponen yang dinilai{% endif %}</span></div>
+<div><small>Cakupan nilai</small><strong>{{ fmt(actual.observed_weight * 100) }}%</strong><span>Bobot dengan skor aktual</span></div>
+<div><small>Rentang akhir</small><strong>{{ fmt(actual.known) }}–{{ fmt(actual.upper) }}</strong><span>Kontribusi tercatat {{ fmt(actual.known) }} poin</span></div>
+</div>
+<div class="detail-grid"><section class="panel"><div class="section-head"><h2>Skor komponen</h2>{% if course.locked %}<small>Struktur terkunci</small>{% else %}<a href="{{ url_for('grades.edit',course_id=course.id) }}">Edit struktur</a>{% endif %}</div>
+<p>Kosong berarti belum diketahui. Isi 0 untuk skor nol yang tercatat.</p>
+<form method="post" action="{{ post('scores') }}">{{ meta(state, action=='scores') }}
+{% for i in items if i.maximum is not none %}<label class="score-line"><span><b>{{ i.path }}</b><small>Bobot efektif {{ fmt(i.effective * 100) }}%</small></span><span class="unit"><input aria-label="Skor aktual {{ i.path }}" name="score_{{ i.node_id }}" inputmode="decimal" placeholder="Kosong" value="{{ form.get('score_'~i.node_id,'') if action=='scores' else (i.earned if i.earned is not none else '') }}"><span>/ {{ i.maximum }}</span></span></label>{% endfor %}
+<button class="button">Simpan skor aktual</button></form></section>
+<section class="panel target"><h2>Target nilai</h2><p>Hitung kebutuhan dari komponen yang masih kosong.</p>
+<form method="post" action="{{ post('target') }}">{{ meta(state, action=='target') }}
+<label>Target angka atau huruf<input name="target" value="{{ form.get('target','') if action=='target' else ((target.numeric_target or target.letter_target) if target else '') }}" placeholder="Mis. 75 atau A"></label>
+<button class="button">Hitung target</button></form>
+{% if result %}<div class="result"><b>{{ result.status }}</b>{% if result.required is not none %}<p>Rerata sisa yang diperlukan <strong>{{ fmt(result.required) }}%</strong>.</p>{% endif %}
+{% if result.minimum is defined %}<p>{{ result.component }} membutuhkan sedikitnya <strong>{{ result.minimum|exact_score }}</strong> poin sesuai langkah skor.</p>{% endif %}</div>{% endif %}
+<small>{{ 'Kebijakan contoh kelas: A ≥ 85, B ≥ 70, C di bawah 70. Klasifikasi memakai presisi penuh.' if course.policy else 'Kebijakan huruf belum ditetapkan. Target angka tetap tersedia.' }}</small>
+{% if policy and actual.observed_weight==1 %}<p>Huruf model: <b>{{ classify(actual.known, policy) }}</b> (sebelum pembulatan).</p>{% endif %}</section></div>
+
+<section class="panel"><div class="section-head"><h2>Simulasi what-if</h2><small>Asumsi terpisah</small></div>
+{% if stale %}<p class="alert">Sumber berubah sejak simulasi disimpan. Tinjau skor aktual dan reset simulasi untuk menghitung kembali.</p>
+{% else %}<p>Isi hanya skor yang ingin dicoba. Komponen lain memakai skor aktual.</p>
+<form method="post" action="{{ post('simulation') }}">{{ meta(state, action=='simulation') }}
+<div class="sim-fields">{% for i in items if i.maximum is not none %}<label>{{ i.path }} (maks. {{ i.maximum }})<input inputmode="decimal" name="score_{{ i.node_id }}" placeholder="Pakai aktual" value="{{ form.get('score_'~i.node_id,'') if action=='simulation' else overlay.get(i.node_id,'') }}"></label>{% endfor %}</div>
+<label>Target simulasi (opsional)<input name="sim_target" placeholder="Gunakan target mata kuliah" value="{{ form.get('sim_target','') if action=='simulation' else overlay_target or '' }}"></label>
+<button class="secondary">Simpan simulasi</button></form>
+{% if projection %}<div class="result"><b>Proyeksi what-if</b><p>Rentang akhir <strong>{{ fmt(projection.known) }}–{{ fmt(projection.upper) }}</strong>. Bobot asumsi {{ fmt(projection.assumed_weight * 100) }}%, bobot aktual terpakai {{ fmt((projection.observed_weight-projection.assumed_weight)*100) }}%.</p>
+{% if projected_target %}<p>Target dalam simulasi: {{ projected_target.status }}{% if projected_target.required is not none %} · kebutuhan sisa {{ fmt(projected_target.required) }}%{% endif %}.</p>{% endif %}</div>{% endif %}{% endif %}
+{% if scenario %}<details><summary>Reset simulasi</summary><p>Hapus seluruh asumsi simulasi pada semua mata kuliah. Skor aktual dan riwayat final tetap tersimpan.</p><form method="post" action="{{ post('reset') }}">{{ meta(state, action=='reset') }}<button class="secondary">Konfirmasi reset simulasi</button></form></details>{% endif %}</section>
+
+<section class="panel" id="final"><h2>Hasil final terkonfirmasi</h2>
+{% if finals %}<ol class="history">{% for f in finals %}<li><b>Revisi {{ f.revision_no }}</b> · {{ f.numeric_value or 'Tanpa angka' }}{% if f.letter_value %} · {{ f.letter_value }}{% endif %} · {{ {'unresolved':'Status belum diketahui','passed':'Dilaporkan lulus','failed':'Dilaporkan tidak lulus'}[f.outcome] }}<small>{{ source_note(f.source) }} · {{ f.occurred_at }} UTC{% if f.correction_reason %} · {{ f.correction_reason }}{% endif %}</small></li>{% endfor %}</ol>
+{% else %}<p>Belum ada hasil final yang dikonfirmasi.</p>{% endif %}
+{% if preview %}<div class="result" id="review"><h3>Tinjau hasil sebelum konfirmasi</h3><p>Angka: <b>{{ preview.data.numeric or '—' }}</b> · Huruf: {{ preview.data.letter or '—' }} · {{ {'unresolved':'Status belum diketahui','passed':'Lulus','failed':'Tidak lulus'}[preview.data.outcome] }}</p>
+<p>Sumber: {{ preview.data.note }}{% if preview.data.reason %} · Koreksi: {{ preview.data.reason }}{% endif %}. Konfirmasi akan menambah satu revisi dan menandai simulasi lama.</p>
+<form method="post" action="{{ post('confirm') }}">{{ meta(state) }}<input type="hidden" name="proof" value="{{ preview.proof }}"><button class="button">Konfirmasi hasil final</button> <a href="{{ url_for('grades.detail',course_id=course.id) }}#final">Batal</a></form></div>
+{% else %}<details {% if action in ('preview','confirm') %}open{% endif %}><summary>{{ 'Koreksi hasil final' if finals else 'Catat hasil final' }}</summary>
+<form method="post" action="{{ post('preview') }}#final">{{ meta(state, action=='preview') }}
+<p>Masukkan hasil yang dilaporkan secara eksplisit. Angka saja tidak menentukan kelulusan.</p>
+<div class="grid3"><label>Nilai angka<input name="numeric" inputmode="decimal" value="{{ form.get('numeric','') }}"></label><label>Nilai huruf<input name="letter" value="{{ form.get('letter','') }}"></label>
+<label>Status yang dilaporkan<select name="outcome">{% for k,v in [('unresolved','Belum diketahui'),('passed','Lulus'),('failed','Tidak lulus')] %}<option value="{{ k }}" {% if form.get('outcome')==k %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></label></div>
+<label>Sumber hasil<input name="note" required maxlength="200" placeholder="Mis. Lembar hasil sintetis" value="{{ form.get('note','') }}"></label>
+{% if finals %}<label>Alasan koreksi<input name="reason" required maxlength="400" value="{{ form.get('reason','') }}"></label>{% endif %}
+<button class="secondary">Tinjau hasil final</button></form></details>{% endif %}
+</section><p class="hint">Model linear v1 · Revisi sumber {{ state.source_revision }} · Kontribusi dan rentang ditampilkan dengan dua desimal.</p>
+{% endblock %}

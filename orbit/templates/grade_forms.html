@@ -1,0 +1,7 @@
+{% macro meta(state, retry=false) -%}
+<input type="hidden" name="csrf" value="{{ session.csrf }}">
+<input type="hidden" name="epoch" value="{{ request.form.get('epoch', state.epoch) if retry else state.epoch }}">
+<input type="hidden" name="revision" value="{{ request.form.get('revision', state.state_revision) if retry else state.state_revision }}">
+<input type="hidden" name="operation" value="{{ request.form.get('operation') if retry and request.form.get('operation') else operation_id() }}">
+{%- endmacro %}
+{% macro alert(error) %}{% if error %}<div class="alert" role="alert" tabindex="-1" autofocus><b>Periksa formulir</b><p>{{ error }}</p><a href="{{ request.path if request.endpoint in ('grades.new','grades.edit') else url_for('grades.detail',course_id=request.view_args.course_id) }}">Muat versi terbaru</a></div>{% endif %}{% endmacro %}

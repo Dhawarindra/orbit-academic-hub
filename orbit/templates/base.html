@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Orbit Academic Hub{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='orbit.css') }}">
+</head>
+<body>
+<a class="skip" href="#main">Ke konten</a>
+<header class="mast"><div class="wrap bar">
+  <a class="brand" href="{{ url_for('foundation.home') }}" aria-label="Orbit Academic Hub"><i class="orbit-mark" aria-hidden="true"></i>Orbit<span>Academic Hub</span></a>
+  <nav aria-label="Navigasi utama">
+    <a href="{{ url_for('foundation.home') }}" {% if request.blueprint=='foundation' %}aria-current="page"{% endif %}>Beranda</a>
+    <a href="{{ url_for('grades.index') }}" {% if request.blueprint=='grades' %}aria-current="page"{% endif %}>Grade Rescue</a>
+  </nav>
+  <span class="demo"><i aria-hidden="true"></i>Demo sintetis</span>
+</div></header>
+<main class="wrap" id="main">{% block main %}{% endblock %}</main>
+<footer class="wrap foot"><strong>Orbit Academic Hub</strong><span>Proyek independen mahasiswa DDP1 · Demo lokal untuk data sintetis.</span></footer>
+</body></html>
