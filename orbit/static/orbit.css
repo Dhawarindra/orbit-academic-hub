@@ -85,6 +85,34 @@ form>.button,form>.secondary {margin-top:.7rem}
 .sim-fields {grid-template-columns:repeat(auto-fit,minmax(min(11rem,100%),1fr))}
 summary {cursor:pointer;color:var(--teal);font-weight:650}details {margin-top:1rem}
 .history {padding-left:1.4rem}.history li{margin:.5rem 0}
+.map-heading {display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.3rem}
+.map-heading h1 em {font-family:Georgia,serif;font-weight:500;color:#27685f}
+.map-welcome {display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;border-top:3px solid var(--teal)}
+.map-welcome h2 {font-size:clamp(1.7rem,4vw,2.4rem)}
+.map-chain {margin:0;list-style:none;padding:1.5rem;display:flex;background:var(--navy);color:white;border-radius:12px}
+.map-chain li {position:relative;flex:1;padding:.2rem .7rem;border-left:2px solid #91d7c8}
+.map-chain span,.map-chain small {color:#d2e3ed;font-size:.78rem}.map-chain strong {display:block;font-size:1.25rem}
+.map-nav {display:flex;gap:1.2rem;flex-wrap:wrap;margin:1.3rem 0}
+.map-term {font-size:.88rem;letter-spacing:.025em;color:#565e83;margin:1.5rem 0 .5rem}
+.map-course {margin:0;padding:1rem;border:1px solid var(--line);border-radius:.6rem}
+.map-course+.map-course {margin-top:.5rem}
+.map-course summary {display:flex;align-items:center;gap:.75rem;color:var(--navy)}
+.map-course summary::before {content:'+';color:var(--teal);font-size:1.3rem}
+.map-course[open] summary::before {content:'−'}
+.map-status {margin-left:auto;font-size:.78rem;padding:.25rem .6rem;background:#eef1f6;border-radius:.45rem;color:#43536b}
+.map-status.met {background:#e3f4ed;color:#175e4c}.map-status.unmet,.warning-text {color:#81400e;background:#fff2de}
+.map-course h4 {margin:1rem 0 .4rem}.map-reasons {padding-left:1.35rem}.map-reasons li {margin:.4rem 0}
+.reason-status {font-size:.85rem;color:var(--muted)}
+.map-plan {border-top:3px solid #5866a0}.map-inputs {display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:center}
+.plan-row {border-top:1px solid var(--line);padding:.6rem 0}.map-plan form h3 {margin-top:1rem}
+.map-impact {display:grid;grid-template-columns:1fr auto;gap:.15rem 1rem;padding:.8rem 0;border-bottom:1px solid var(--line)}
+.map-impact small {grid-column:1/-1}#rencana code {overflow-wrap:anywhere}
+@media(max-width:760px){
+ .map-welcome,.map-inputs {grid-template-columns:1fr;gap:.45rem}
+ .map-chain {padding:1rem .45rem}.map-course summary {flex-wrap:wrap}.map-status {margin-left:0}
+ .map-course {padding:.75rem}.plan-row {padding-bottom:1rem}.map-plan form .map-inputs {margin-top:.5rem}
+ .bar nav {flex-wrap:wrap}
+}
 .foot {border-top:1px solid var(--line);padding:1.4rem 0;color:var(--muted);font-size:.78rem;flex-wrap:wrap}
 @media(max-width:760px){
  .wrap{width:calc(100% - 2rem)}.bar{gap:.75rem;padding:.8rem 0}.bar nav{order:3;width:100%;gap:1.5rem}
@@ -92,4 +120,41 @@ summary {cursor:pointer;color:var(--teal);font-weight:650}details {margin-top:1r
  .intro-grid,.detail-grid{gap:0}.row-fields{grid-template-columns:1fr 1fr}.row-fields label:first-child{grid-column:1/-1}
  .metrics{grid-template-columns:1fr}.metrics div{padding:1rem}.brand span{display:none}
  .score-line{flex-wrap:wrap}.page-head .secondary{margin-bottom:.25rem}
+}
+
+/* Read-only academic overview */
+.dash-head,.dash-columns,.grade-facts,.dash-semesters {display:grid;gap:1rem}
+.dash-head {grid-template-columns:1fr minmax(15rem,auto);align-items:end;margin-bottom:1.5rem}
+.dash-head .crumb {margin-bottom:.4rem}
+.dash-head p:last-child {margin-bottom:0}
+.term-filter div {display:flex;gap:.5rem;align-items:center}
+.term-filter select {max-width:22rem;margin:0}
+.term-filter .secondary {min-height:44px;flex-shrink:0;white-space:nowrap}
+.dash-metrics {grid-template-columns:repeat(3,minmax(0,1fr))}
+.dash-metrics strong {font-size:clamp(1.45rem,3vw,2.2rem)}
+.dash-columns {grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);align-items:start}
+.dash-grades {border-top:3px solid #5f6eaa}
+.dash-road {border-top:3px solid var(--teal)}
+.dash-columns .section-head,.dash-plan .section-head {align-items:baseline;flex-wrap:wrap}
+.dash-columns .section-head>a,.dash-plan .section-head>a {font-size:.86rem}
+.dash-course {border-top:1px solid var(--line);margin-top:1.1rem;padding-top:1.1rem;overflow-wrap:anywhere}
+.dash-course h3 {margin:.25rem 0}
+.grade-facts {grid-template-columns:repeat(2,minmax(0,1fr));background:#f4f6fa;padding:.9rem;border-radius:8px;gap:.75rem}
+.grade-facts dt {color:var(--muted);font-size:.82rem}
+.grade-facts dd {margin:0;font-weight:650;font-variant-numeric:tabular-nums}
+.dash-whatif {background:#eef1fb;border-left:3px solid #5968a2;padding:.7rem 1rem;border-radius:6px}
+.dash-whatif p {margin:.25rem 0}
+.dash-eligibility {list-style:none;padding:0;margin:.5rem 0 1rem}
+.dash-eligibility li {display:flex;align-items:center;flex-wrap:wrap;gap:.3rem .7rem;padding:.8rem 0;border-top:1px solid var(--line)}
+.dash-eligibility small {width:100%}
+.dash-semesters {grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr))}
+.dash-semesters>div {border-top:1px solid var(--line);padding-top:1rem}
+.dash-empty {padding-top:1.4rem}
+.dash-notices ul,.dash-semesters ul {padding-left:1.2rem}
+.dash-notices li {margin:.45rem 0}
+.dash-plan,.dash-road,.dash-notices,.dash-head,.dash-metrics,.alert code {overflow-wrap:anywhere}
+@media(max-width:760px){
+  .dash-head,.dash-columns,.dash-metrics {grid-template-columns:minmax(0,1fr)}
+  .dash-columns {gap:0}
+  .term-filter div {max-width:100%}
 }

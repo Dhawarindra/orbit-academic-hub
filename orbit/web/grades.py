@@ -12,7 +12,7 @@ from uuid import uuid4
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 from itsdangerous import BadSignature, URLSafeSerializer
 
-from orbit.domain.grades import InvalidInput, classify, display, parse_target, solve_target, summarize, validate_structure
+from orbit.domain.grades import InvalidInput, classify, display, parse_target, validate_structure
 from orbit.services import gradebook as book
 
 grades = Blueprint("grades", __name__, url_prefix="/grades")
@@ -42,9 +42,9 @@ def helpers():
     return dict(operation_id=lambda: uuid4().hex, fmt=display)
 
 
-@grades.before_request
+@grades.before_app_request
 def csrf_check():
-    if request.method == "POST":
+    if request.method == "POST" and request.blueprint in ("grades", "roadmap"):
         token = session.get("csrf")
         if not token or not hmac.compare_digest(request.form.get("csrf", "").encode(), token.encode()):
             abort(403, "Formulir kedaluwarsa. Muat ulang halaman.")
@@ -54,15 +54,14 @@ def database():
     return current_app.config["DATABASE"]
 
 
-def listed():
-    with book.snapshot(database()) as db:
-        return book.courses(db)
-
-
 @grades.get("")
 @grades.get("/")
 def index():
-    return render_template("grade_index.html", courses=listed())
+    term_id = request.args.get("term_id")
+    with book.snapshot(database()) as db:
+        courses = book.courses(db, term_id)
+        term_scope = book.selected_term(db, term_id)
+    return render_template("grade_index.html", courses=courses, term_scope=term_scope)
 
 
 def new_rows(example=False):
@@ -102,11 +101,12 @@ def editor(course_id=None):
         if row and row["locked"] and request.method == "GET":
             return redirect(url_for("grades.detail", course_id=course_id))
         example = request.args.get("example") == "1"
+        term_scope = book.selected_term(db, request.args.get("term_id"))
         entries = ([component_row(i) for i in book.components(db, row["brp_id"])]
-                   if row else new_rows(example))
+                   if row and row["brp_id"] else new_rows(example))
     form = request.form
     values = form if request.method == "POST" else (row or {"name": "Dasar Pemrograman" if example else "",
-                                                           "term": "Semester demo" if example else ""})
+                                                           "term": term_scope["label"] if term_scope else ("Semester demo" if example else "")})
     error, status = None, 200
     if request.method == "POST":
         try:
@@ -131,7 +131,7 @@ def editor(course_id=None):
             error, status = message(exc)
     return render_template("grade_editor.html", course=row, values=values, entries=entries, state=state,
                            form=form, error=error, example=example,
-                           rules=json.loads(row["unsupported_rules"]) if row else []), status
+                           rules=json.loads(row["unsupported_rules"] or "[]") if row else []), status
 
 
 @grades.route("/new", methods=["GET", "POST"])
@@ -159,29 +159,15 @@ def course_page(course_id, *, error=None, status=200, action="", preview=None):
     with book.snapshot(database()) as db:
         state = book.workspace(db)
         row = book.course(db, course_id)
-        items = book.components(db, row["brp_id"])
-        target = db.execute("SELECT * FROM course_target WHERE enrollment_id=?", (course_id,)).fetchone()
-        finals = book.history(db, course_id)
         scenario = book.scenario(db)
-    is_stale = bool(book.stale(scenario, state))
-    overlay = json.loads(scenario["score_overlay"]) if scenario else {}
-    here = {i.node_id: overlay[i.node_id] for i in items if i.node_id in overlay}
-    overlay_target = json.loads(scenario["target_overlay"]).get(course_id) if scenario else None
-    actual = summarize(items)
-    projection = summarize(items, here) if (here or overlay_target) and not is_stale else None
-    numeric = letter = None
-    if target:
-        numeric, letter = parse_target(target["numeric_target"] or target["letter_target"])
-    rules = json.loads(row["unsupported_rules"])
-    policy = book.bound_policy(row) if not rules else None
-    result = solve_target(actual, numeric, letter, policy)
-    sim_target = parse_target(overlay_target) if overlay_target else (numeric, letter)
-    projected_target = solve_target(projection, *sim_target, policy) if projection else None
-    return render_template("grade_detail.html", course=row, items=items, actual=actual, projection=projection,
-                           target=target, result=result, projected_target=projected_target, overlay=here, state=state,
-                           stale=is_stale, scenario=scenario, finals=finals, form=request.form, classify=classify,
-                           source_note=lambda data: json.loads(data)["source_ref"], action=action,
-                           preview=preview, error=error, overlay_target=overlay_target, rules=rules, policy=policy), status
+        is_stale = bool(book.stale(scenario, state))
+        summary = book.read_summary(db, row, scenario, is_stale)
+    if summary["actual"] is None:
+        return redirect(url_for("grades.edit", course_id=course_id))
+    return render_template("grade_detail.html", **summary, state=state, stale=is_stale,
+                           scenario=scenario, form=request.form, classify=classify, action=action,
+                           source_note=lambda data: json.loads(data).get("source_ref") or "Sumber perlu verifikasi",
+                           preview=preview, error=error), status
 
 
 @grades.get("/<course_id>")

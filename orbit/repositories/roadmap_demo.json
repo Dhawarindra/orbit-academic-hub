@@ -1,0 +1,47 @@
+{
+  "curriculum_id": "orbit-demo-abc-v1",
+  "program": "Orbit Demo",
+  "version": "1",
+  "applicability": "Contoh sintetis A–C",
+  "is_synthetic": true,
+  "source_ref": "PRD-02 §9 · ARCH-03 §5 · Contoh A → B → C",
+  "rule_version": "demo-chain-1",
+  "courses": [
+    {
+      "id": "A",
+      "label": "Demo A",
+      "recommended": 1,
+      "sks": 3,
+      "availability": "every_term",
+      "rule": {
+        "id": "A-root",
+        "op": "none",
+        "source_ref": "Contoh rantai tertutup A → B → C, ARCH-03 §5"
+      }
+    },
+    {
+      "id": "B",
+      "label": "Demo B",
+      "recommended": 2,
+      "sks": 4,
+      "availability": "every_term",
+      "rule": {
+        "id": "B-requires-A",
+        "op": "passed",
+        "course_id": "A"
+      }
+    },
+    {
+      "id": "C",
+      "label": "Demo C",
+      "recommended": 3,
+      "sks": 3,
+      "availability": "every_term",
+      "rule": {
+        "id": "C-requires-B",
+        "op": "passed",
+        "course_id": "B"
+      }
+    }
+  ]
+}

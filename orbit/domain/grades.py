@@ -150,24 +150,24 @@ def solve_target(summary, numeric, letter, policy):
         if not letter:
             return None
         if not policy or letter not in policy:
-            return {"status": "Kebijakan huruf belum tersedia", "required": None}
+            return {"status": "Kebijakan huruf belum tersedia", "required": None, "needs_review": True}
         numeric = policy[letter]
     remaining = 1 - summary.observed_weight
     if not remaining:
         label = "Target tercapai" if summary.known >= numeric else "Target tidak tercapai"
-        return {"status": label, "required": None}
+        return {"status": label, "required": None, "needs_review": summary.known < numeric}
     required = (Fraction(numeric) - summary.known) / remaining
     label = "Dapat dicapai"
     if required <= 0:
         label = "Target sudah terpenuhi dalam model"
     elif required > 100:
         label = "Tidak dapat dicapai"
-    result = {"status": label, "required": required}
+    result = {"status": label, "required": required, "needs_review": required > 100}
     if len(summary.missing) == 1 and 0 < required <= 100:
         item = summary.missing[0]
         step = Fraction(item.quantum)
         minimum = ceil(required * Fraction(item.maximum) / (100 * step)) * step
         result.update(minimum=minimum, component=item.path)
         if minimum > item.maximum:
-            result["status"] = "Tidak tercapai pada langkah skor ini"
+            result.update(status="Tidak tercapai pada langkah skor ini", needs_review=True)
     return result

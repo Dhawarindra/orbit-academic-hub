@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Grade Rescue · Orbit Academic Hub{% endblock %}
 {% block main %}
-<p class="crumb"><a href="/">Beranda</a> / Grade Rescue</p>
+<p class="crumb"><a href="{{ url_for('foundation.home') }}">Dashboard</a> / Grade Rescue{% if term_scope %} · {{ term_scope.label }}{% endif %}</p>
 <div class="page-head"><div><h1>Grade Rescue</h1><p>Kelola komponen penilaian dan uji target per mata kuliah.</p></div>
 <a class="button" href="{{ url_for('grades.new') }}">+ Tambah mata kuliah</a></div>
 <section class="panel"><div class="section-head"><h2>Mata kuliah saya</h2><span class="count">{{ courses|length }}</span></div>

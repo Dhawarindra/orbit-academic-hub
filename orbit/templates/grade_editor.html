@@ -8,7 +8,7 @@
 {{ meta(state, request.method=='POST') }}
 <button type="submit" name="edit" value="save" hidden>Simpan struktur</button>
 <section class="panel"><h2>{{ course.name if course else 'Detail mata kuliah' }}</h2>
-{% if course %}<p>{{ course.term }} · BRP versi {{ course.version_no }}</p>{% else %}
+{% if course %}<p>{{ course.term }} · {{ 'BRP versi '~course.version_no if course.version_no else 'Struktur baru' }}</p>{% else %}
 <div class="grid3"><label>Nama mata kuliah<input name="name" value="{{ values.name }}" placeholder="Mis. Dasar Pemrograman" maxlength="100" required></label>
 <label>Periode<input name="term" value="{{ values.term }}" placeholder="Mis. Ganjil 2026" maxlength="100" required></label>
 <label>Kelas (opsional)<input name="class_name" value="{{ values.class_name }}" placeholder="Mis. A" maxlength="100"></label></div>
