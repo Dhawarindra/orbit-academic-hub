@@ -39,6 +39,7 @@ def activate_file(path):
 def page(error=None, status=200, action=None):
     with book.snapshot(current_app.config["DATABASE"]) as db:
         view = service.read(db)
+        view["term_scope"] = book.selected_term(db, request.args.get("term_id"))
     return render_template("roadmap.html", **view, error=error, action=action, form=request.form), status
 
 

@@ -31,6 +31,12 @@ Di Codex Cloud yang sudah disiapkan, jalankan dari `/workspace/orbit-academic-hu
 
 Buka `http://127.0.0.1:5000/` di browser pada perangkat yang menjalankan server, lalu pilih **Buka Grade Rescue**. Alamat langsungnya `http://127.0.0.1:5000/grades/`. Gunakan Ctrl+C untuk menghentikan server dan ulangi perintah terakhir untuk memulai kembali.
 
+### Membuka Dashboard
+
+Halaman utama `/` dan `/dashboard/` menampilkan **Ringkasan akademik**. Filter periode berlaku untuk pengambilan Grade Rescue. Prasyarat dan SKS Roadmap memakai bukti dari seluruh periode pada katalog aktif. Setiap kali halaman dibuka, kedua bagian membaca satu revisi SQLite. Tautan pada hasil dan peringatan membuka data asal.
+
+Catat skor atau konfirmasikan hasil final di Grade Rescue, lalu kembali ke **Dashboard** untuk melihat perubahan. Proyeksi ditampilkan pada bagian simulasi. Setelah sumber berubah, Dashboard menampilkan revisi dasar dan perubahan yang perlu ditinjau di modul asal.
+
 ### Mencoba Grade Rescue
 
 1. Pilih **Coba contoh sintetis** di beranda untuk membuka formulir kuis bertingkat, UTS, dan UAS. Tinjau nama, periode, dan bobot, kemudian pilih **Simpan struktur**. Untuk struktur sendiri, gunakan **Tambah mata kuliah**. Simpan struktur dengan semua skor kosong jika masih ingin mengeditnya.
@@ -67,6 +73,7 @@ Mode debug dan reloader dinonaktifkan. Konfigurasi `FLASK_DEBUG=1` ditolak. Guna
 | `orbit/__init__.py`, `__main__.py`, `config.py` | Membuat aplikasi, membaca konfigurasi, dan menjalankan server lokal. |
 | `orbit/web/` | Pemeriksaan request lokal, proteksi formulir, dan route Grade Rescue serta Roadmap. |
 | `orbit/domain/roadmap.py`, `orbit/services/academic_roadmap.py` | Validasi katalog, evaluasi prasyarat, pengambilan terikat versi, dan skenario semester. |
+| `orbit/services/dashboard.py` | Membaca konteks, ringkasan dan peringatan kedua modul dalam satu transaksi baca. |
 | `orbit/domain/grades.py`, `orbit/services/gradebook.py` | Validasi dan perhitungan presisi penuh, transaksi nilai, serta isolasi simulasi. |
 | `orbit/templates/`, `orbit/static/` | Template Jinja dan CSS lokal. |
 | `orbit/repositories/` | Membuka, memeriksa, dan menutup koneksi SQLite. |

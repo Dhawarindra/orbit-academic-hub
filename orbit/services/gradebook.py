@@ -8,7 +8,10 @@ from decimal import Decimal
 from fractions import Fraction
 from uuid import uuid4
 
-from orbit.domain.grades import Component, DEMO_THRESHOLDS, InvalidInput, classify, decimal_input, parse_score
+from orbit.domain.grades import (
+    Component, DEMO_THRESHOLDS, InvalidInput, classify, decimal_input, parse_score,
+    parse_target, solve_target, summarize,
+)
 from orbit.repositories.sqlite_store import open_database
 
 
@@ -65,14 +68,26 @@ def command(path, form, action, course_id, writer):
 
 
 COURSES = """SELECT e.enrollment_id AS id, o.personal_label AS name, o.class_label AS class_name,
-             t.label AS term, p.policy_id AS policy, p.thresholds, b.brp_id, b.version_no, b.locked, b.unsupported_rules
+             t.label AS term, t.term_id, o.source AS offering_source, p.version AS policy_version,
+             b.rule_version, p.policy_id AS policy, p.thresholds, b.brp_id, b.version_no, b.locked, b.unsupported_rules
              FROM enrollment e JOIN offering o USING(offering_id) JOIN academic_term t USING(term_id)
-             JOIN brp_version b ON b.enrollment_id=e.enrollment_id AND b.status='active'
+             LEFT JOIN brp_version b ON b.enrollment_id=e.enrollment_id AND b.status='active'
              LEFT JOIN grade_policy p ON p.offering_id=o.offering_id"""
 
 
-def courses(db):
-    return db.execute(COURSES + " ORDER BY o.personal_label,t.sequence_no,o.class_label").fetchall()
+def selected_term(db, term_id):
+    if term_id:
+        return db.execute("SELECT term_id,label FROM academic_term WHERE term_id=?", (term_id,)).fetchone()
+    return None
+
+
+def courses(db, term_id=None):
+    query = COURSES
+    params = ()
+    if term_id:
+        query += " WHERE t.term_id=?"
+        params = (term_id,)
+    return db.execute(query + " ORDER BY o.personal_label,t.sequence_no,o.class_label,e.enrollment_id", params).fetchall()
 
 
 def course(db, course_id):
@@ -128,16 +143,16 @@ def create_course(db, state, form):
 
 
 def save_structure(db, state, course_id, items, rule_note):
-    previous = db.execute("SELECT * FROM brp_version WHERE enrollment_id=? AND status='active'",
-                          (course_id,)).fetchone()
-    if previous and previous["locked"]:
+    previous = db.execute("""SELECT COALESCE(MAX(version_no),0) AS version_no, MAX(locked) AS locked
+                             FROM brp_version WHERE enrollment_id=?""", (course_id,)).fetchone()
+    if previous["locked"]:
         raise Conflict("Struktur terkunci karena skor pernah disimpan.")
     brp = uuid4().hex
     db.execute("UPDATE brp_version SET status='superseded' WHERE enrollment_id=?", (course_id,))
     if len(rule_note) > 300:
         raise InvalidInput("Batasi catatan aturan tambahan hingga 300 karakter.")
     db.execute("INSERT INTO brp_version VALUES(?,?,?,'active',?,?,?,?)",
-               (brp, course_id, previous["version_no"]+1 if previous else 1,
+               (brp, course_id, previous["version_no"] + 1,
                 int(any(i.earned is not None for i in items)), source(), "linear-1",
                 json.dumps([rule_note] if rule_note else [])))
     root = uuid4().hex
@@ -249,6 +264,31 @@ def final_input(form, policy, previous):
 def history(db, course_id):
     return db.execute("SELECT * FROM actual_final_revision WHERE enrollment_id=? ORDER BY revision_no DESC",
                       (course_id,)).fetchall()
+
+
+def read_summary(db, row, scenario_row, is_stale):
+    """Shared Grade Rescue read model. The caller owns the read transaction."""
+    course_id = row["id"]
+    items = components(db, row["brp_id"])
+    target = db.execute("SELECT * FROM course_target WHERE enrollment_id=?", (course_id,)).fetchone()
+    finals = history(db, course_id)
+    overlay = json.loads(scenario_row["score_overlay"]) if scenario_row else {}
+    here = {item.node_id: overlay[item.node_id] for item in items if item.node_id in overlay}
+    overlay_target = json.loads(scenario_row["target_overlay"]).get(course_id) if scenario_row else None
+    rules = json.loads(row["unsupported_rules"] or "[]")
+    policy = bound_policy(row) if not rules else None
+    actual = summarize(items) if row["brp_id"] and items else None
+    target_value = (target["numeric_target"] or target["letter_target"]) if target else None
+    numeric, letter = parse_target(target_value) if target_value else (None, None)
+    result = solve_target(actual, numeric, letter, policy) if actual else None
+    projection = projected_target = None
+    if actual and not is_stale and (here or overlay_target):
+        projection = summarize(items, here)
+        sim_target = parse_target(overlay_target) if overlay_target else (numeric, letter)
+        projected_target = solve_target(projection, *sim_target, policy)
+    return dict(course=row, items=items, actual=actual, target=target, result=result,
+                projection=projection, projected_target=projected_target, overlay=here,
+                overlay_target=overlay_target, finals=finals, policy=policy, rules=rules)
 
 
 def confirm_final(db, state, row, data):

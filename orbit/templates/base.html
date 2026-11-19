@@ -11,7 +11,7 @@
 <header class="mast"><div class="wrap bar">
   <a class="brand" href="{{ url_for('foundation.home') }}" aria-label="Orbit Academic Hub"><i class="orbit-mark" aria-hidden="true"></i>Orbit<span>Academic Hub</span></a>
   <nav aria-label="Navigasi utama">
-    <a href="{{ url_for('foundation.home') }}" {% if request.blueprint=='foundation' %}aria-current="page"{% endif %}>Beranda</a>
+    <a href="{{ url_for('foundation.home') }}" {% if request.blueprint=='foundation' %}aria-current="page"{% endif %}>Dashboard</a>
     <a href="{{ url_for('grades.index') }}" {% if request.blueprint=='grades' %}aria-current="page"{% endif %}>Grade Rescue</a>
     <a href="{{ url_for('roadmap.index') }}" {% if request.blueprint=='roadmap' %}aria-current="page"{% endif %}>Academic Roadmap</a>
   </nav>

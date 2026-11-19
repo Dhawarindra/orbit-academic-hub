@@ -16,7 +16,7 @@ from orbit.repositories.sqlite_store import open_database
 from orbit.services import academic_roadmap as service, gradebook as book
 
 
-class RoadmapWorkflowTests(unittest.TestCase):
+class OrbitWorkflowCase(unittest.TestCase):
     base = "http://127.0.0.1:5000"
     version = "orbit-demo-abc-v1"
 
@@ -73,6 +73,8 @@ class RoadmapWorkflowTests(unittest.TestCase):
         return book.command(self.path, MultiDict(token), "catalog-activate", data["curriculum_id"],
                             lambda db, state: service.activate_catalog(db, data))
 
+
+class RoadmapWorkflowTests(OrbitWorkflowCase):
     def test_map_t_001_008_opt_in_navigation_catalog_and_restart(self):
         self.assertIn("Academic Roadmap", self.get("/"))
         self.assertIn("Gunakan katalog contoh", self.get())

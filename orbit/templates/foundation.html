@@ -1,15 +1,174 @@
 {% extends "base.html" %}
+{% block title %}Dashboard · Orbit Academic Hub{% endblock %}
+{% set eligibility = {'met':'Memenuhi syarat', 'unknown':'Belum diketahui', 'unmet':'Belum memenuhi syarat'} %}
+{% set outcomes = {'passed':'Lulus', 'failed':'Gagal', 'unresolved':'Kelulusan belum diketahui'} %}
+{% macro source_link(n) -%}
+  {% if n.course_id %}
+    <a href="{{ url_for(n.endpoint, course_id=n.course_id, _anchor=n.anchor) }}">{{ n.text }}</a>
+  {% else %}
+    <a href="{{ url_for(n.endpoint, _anchor=n.anchor) }}">{{ n.text }}</a>
+  {% endif %}
+{%- endmacro %}
 {% block main %}
-<div class="hero">
-  <div class="hero-copy"><p class="eyebrow">Orbit Academic Hub</p><h1>Grade <em>Rescue.</em></h1>
-  <p>Hitung posisi nilai saat ini dan cari tahu skor yang kamu perlukan untuk mencapai target.</p>
-  <div class="actions"><a class="button light" href="{{ url_for('grades.index') }}">Buka Grade Rescue <span aria-hidden="true">→</span></a>
-  <a class="hero-link" href="{{ url_for('grades.new', example=1) }}">Coba contoh sintetis</a></div></div>
-  <div class="orbit-art" aria-hidden="true"><i></i><i></i><i></i><b>∑</b></div>
+{% if error %}
+<section class="panel">
+  <h1>Ringkasan belum tersedia</h1>
+  <p role="alert">{{ error }}</p>
+  {% if missing_term %}<a href="{{ url_for('foundation.home', term_id='') }}">Tampilkan semua periode</a>
+  {% else %}<a href="{{ url_for('foundation.home') }}">Muat ulang Dashboard</a>{% endif %}
+</section>
+{% else %}
+<header class="dash-head">
+  <div><p class="crumb">Dashboard / Workspace lokal</p><h1>Ringkasan akademik</h1>
+    <p>Data sintetis · Workspace r{{ state.state_revision }} · Sumber r{{ state.source_revision }} ·
+      <time datetime="{{ calculated_at.isoformat() }}">{{ calculated_at.strftime('%d/%m/%Y, %H.%M WIB') }}</time></p>
+  </div>
+  {% if terms %}
+  <form method="get" action="{{ url_for('foundation.home', term_id='') }}" class="term-filter">
+    <label for="periode">Periode pengambilan</label>
+    <div><select id="periode" name="term_id">
+      <option value="">Semua periode</option>
+      {% for t in terms %}<option value="{{ t.term_id }}" {% if term and t.term_id == term.term_id %}selected{% endif %}>{{ t.label }}</option>{% endfor %}
+    </select><button class="secondary">Tampilkan</button></div>
+  </form>
+  {% endif %}
+</header>
+
+<section class="metrics dash-metrics" aria-label="Konteks akademik">
+  <div><small>Mata kuliah diambil</small><strong>{{ cards|length }}</strong>
+    <span>{{ term.label if term else ('Semua periode pengambilan' if terms else 'Periode belum tersedia') }}</span></div>
+  <div><small>SKS lulus di katalog</small>
+    {% if road.catalog %}<strong>{{ road.credits.completed }} SKS</strong><span>Seluruh periode · {{ road.credits.excluded }} pengambilan di luar cakupan</span>
+    {% else %}<strong>Belum tersedia</strong><span>{{ 'Katalog perlu diperiksa' if catalog_error else 'Belum ada katalog aktif' }}</span>{% endif %}
+  </div>
+  <div><small>Skenario bersama</small>
+    <strong>{{ 'Perlu ditinjau' if stale else 'Aktif' if has_overlay else 'Kosong' }}</strong>
+    <span>{% if scenario %}Skenario r{{ scenario.scenario_revision }} · Sumber dasar r{{ scenario.base_source_revision }}{% else %}Belum ada simulasi tersimpan{% endif %}</span>
+  </div>
+</section>
+
+{% if stale %}
+<section class="alert" aria-label="Status skenario">
+  <h2>Sumber skenario berubah</h2>
+  <p>Simulasi memakai sumber r{{ scenario.base_source_revision }}. Ringkasan aktual memakai r{{ state.source_revision }}.
+    Tinjau perubahan dan reset skenario untuk menghitung proyeksi kembali.</p>
+  {% if changes %}<details><summary>Perubahan sejak simulasi disimpan</summary><ul>
+    {% for c in changes %}
+    <li>r{{ c.source_revision }} · {{ change_labels.get(c.event_type, c.event_type) }} · <code>{{ c.entity_id }}</code></li>
+    {% endfor %}
+  </ul></details>{% endif %}
+  {% if road.catalog %}<a href="{{ url_for('roadmap.index', _anchor='rencana') }}">Tinjau skenario di Roadmap →</a>
+  {% elif cards %}<a href="{{ url_for('grades.detail', course_id=cards[0].course.id, _anchor='simulasi') }}">Tinjau simulasi di Grade Rescue →</a>
+  {% else %}<a href="{{ url_for('grades.index', term_id='') }}">Lihat pengambilan Grade Rescue →</a>{% endif %}
+</section>
+{% endif %}
+
+<div class="dash-columns">
+<section class="panel dash-grades" aria-labelledby="nilai">
+  <div class="section-head"><h2 id="nilai">Nilai &amp; target</h2><a href="{{ url_for('grades.index') }}">Buka Grade Rescue →</a></div>
+  {% for card in cards %}
+  {% set c = card.course %}
+  <article class="dash-course">
+    <div class="section-head">
+      <div><small>{{ c.term }}{% if c.class_name %} · Kelas {{ c.class_name }}{% endif %}</small>
+        <h3><a href="{{ url_for('grades.detail', course_id=c.id) }}">{{ c.name }}</a></h3>
+      </div>
+      {% if c.version_no %}<small>BRP v{{ c.version_no }}</small>{% endif %}
+    </div>
+    {% if card.actual %}
+    <dl class="grade-facts">
+      <div><dt>Kontribusi tercatat</dt><dd>{{ fmt(card.actual.known) }} poin</dd></div>
+      <div><dt>Bobot terisi</dt><dd>{{ fmt(card.actual.observed_weight * 100) }}%</dd></div>
+      <div><dt>Rerata teramati</dt><dd>{{ fmt(card.actual.average) }}</dd></div>
+      <div><dt>Rentang akhir</dt><dd>{{ fmt(card.actual.known) }}–{{ fmt(card.actual.upper) }}</dd></div>
+    </dl>
+    <small>Model linear · {{ card.source or 'Sumber input perlu diverifikasi' }}</small>
+    {% else %}
+    <p>Perhitungan menunggu <a href="{{ url_for('grades.edit', course_id=c.id) }}">struktur penilaian</a>.</p>
+    {% endif %}
+    <p><a href="{{ url_for('grades.detail', course_id=c.id, _anchor='target') }}">Target nilai</a> ·
+      {% if card.target %}<b>{{ card.target.numeric_target or card.target.letter_target }}</b>
+        {% if card.result %} · {{ card.result.status }}
+          {% if card.result.required is not none %} · Rerata sisa {{ fmt(card.result.required) }}%{% endif %}
+        {% endif %}
+      {% else %}Belum ditetapkan{% endif %}
+    </p>
+    <p><a href="{{ url_for('grades.detail', course_id=c.id, _anchor='final') }}">Hasil final</a> ·
+      {% if card.final %}
+        <b>{{ outcomes[card.final.outcome] }}</b>
+        {% if card.final.numeric_value is not none %} · {{ card.final.numeric_value }}{% endif %}
+        {% if card.final.letter_value %} · {{ card.final.letter_value }}{% endif %}
+        <small>Dikonfirmasi pengguna · r{{ card.final.revision_no }} · {{ card.final_source or 'Sumber perlu diverifikasi' }}</small>
+      {% else %}Belum dikonfirmasi{% endif %}
+    </p>
+    {% if card.projection %}
+    <div class="dash-whatif">
+      <a href="{{ url_for('grades.detail', course_id=c.id, _anchor='simulasi') }}">Simulasi nilai</a>
+      <p>Rentang hipotetis <b>{{ fmt(card.projection.known) }}–{{ fmt(card.projection.upper) }}</b>
+        · Bobot asumsi {{ fmt(card.projection.assumed_weight * 100) }}%</p>
+      {% if card.projected_target %}<small>Target simulasi {{ card.overlay_target or card.target.numeric_target or card.target.letter_target }}
+        · {{ card.projected_target.status }}</small>{% endif %}
+    </div>
+    {% endif %}
+  </article>
+  {% else %}
+  <div class="dash-empty"><h3>Belum ada pengambilan{% if term %} di periode ini{% endif %}</h3>
+    <p>Tambahkan mata kuliah dan bobot penilaian untuk melihat posisi nilai serta rentang yang masih mungkin dicapai.</p>
+    <div class="actions"><a class="button" href="{{ url_for('grades.new') }}">Tambah mata kuliah</a>
+      <a href="{{ url_for('grades.new', example=1) }}">Coba contoh sintetis</a></div>
+  </div>
+  {% endfor %}
+</section>
+
+<section class="panel dash-road" aria-labelledby="jalur">
+  <div class="section-head"><h2 id="jalur">Prasyarat aktual</h2><a href="{{ url_for('roadmap.index') }}">Academic Roadmap →</a></div>
+  {% if road.catalog %}
+    <p class="hint">{{ road.catalog.meta.applicability }} · v{{ road.catalog.meta.version }} · Hasil final seluruh periode</p>
+    <p>{{ eligibility_counts.met }} memenuhi syarat · {{ eligibility_counts.unmet }} belum memenuhi · {{ eligibility_counts.unknown }} belum diketahui</p>
+    <ul class="dash-eligibility">
+    {% for key,c in road.catalog.courses.items() %}
+      {% set rule = road.reasons[key] %}
+      <li><a href="{{ url_for('roadmap.index', _anchor='prasyarat-'~key) }}">{{ c.label }}</a>
+        <span class="map-status {{ rule.status }}">{{ eligibility[rule.status] }}</span>
+        <small>{{ rule.text }}</small>
+      </li>
+    {% endfor %}
+    </ul>
+    <small>{{ road.catalog.meta.source_ref }} · Aturan {{ road.catalog.meta.rule_version }}</small>
+  {% elif catalog_error %}
+    <p class="alert">{{ catalog_error }}</p>
+  {% else %}
+    <div class="dash-empty"><h3>Katalog belum dipilih</h3><p>Aktifkan katalog sintetis di Roadmap untuk melihat syarat setiap mata kuliah. Hubungkan pengambilan Grade Rescue untuk memakai hasil finalmu.</p>
+      <a class="secondary" href="{{ url_for('roadmap.index') }}">Pilih katalog contoh</a></div>
+  {% endif %}
+</section>
 </div>
-<div class="intro-grid">
-  <section class="panel home-card"><h2>Academic Roadmap</h2><p>Telusuri prasyarat, susun beban SKS, dan lihat dampak menunda mata kuliah satu semester.</p><a href="{{ url_for('roadmap.index') }}">Buka Academic Roadmap →</a></section>
-  <section class="panel home-card"><h2>Struktur penilaian</h2><p>Susun bobot kuis, tugas, UTS, dan UAS sesuai rencana kelas. Komponen dapat memiliki subkomponen.</p><a href="{{ url_for('grades.new') }}">Tambah mata kuliah →</a></section>
-  <section class="panel home-card"><h2>Contoh perhitungan</h2><p>Kuis dan UTS menyumbang 36 poin dari 50% bobot terisi. Untuk target akhir 75, skor UAS yang diperlukan adalah 78 dari 100.</p><a href="{{ url_for('grades.new',example=1) }}">Buka struktur contoh →</a></section>
-</div>
+
+<section class="panel dash-plan" aria-labelledby="rencana">
+  <div class="section-head"><h2 id="rencana">Rencana semester</h2><a href="{{ url_for('roadmap.index', _anchor='rencana') }}">Buka simulator →</a></div>
+  {% if stale %}<p>Perhitungan semester ditahan sampai skenario diperbarui.</p>
+  {% elif not road.catalog %}<p>Rencana semester memerlukan katalog aktif.</p>
+  {% elif not road.selected %}<p>Belum ada pilihan semester. Pilih mata kuliah dan asumsi lulus di simulator untuk melihat beban SKS.</p>
+  {% else %}
+    <p class="hint">Simulasi hipotetis · Skenario r{{ scenario.scenario_revision }} ·
+      {% if road.plan.cap %}Batas personal {{ road.plan.cap }} SKS{% else %}Batas personal belum ditetapkan{% endif %}</p>
+    <div class="dash-semesters">
+      {% for t,total in road.credits.totals.items() %}
+      <div><h3>Semester {{ t }} · {{ total }} SKS</h3><ul>
+        {% for key,term_no in road.selected.items() if term_no==t %}
+        {% set earliest,why = road.timing[key] %}
+        <li>{{ road.catalog.courses[key].label }} · {{ 'Paling awal S'~earliest if earliest else 'Waktu belum diketahui' }}
+          {% if why %}<small>{{ why }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul></div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% if notices %}
+<section class="panel dash-notices"><h2>Perlu ditinjau</h2><ul>
+  {% for n in notices %}<li>{{ source_link(n) }}</li>{% endfor %}
+</ul></section>
+{% endif %}
+{% endif %}
 {% endblock %}

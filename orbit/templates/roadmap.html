@@ -6,7 +6,7 @@
 {% macro hidden(kind) %}{{ meta(state, action==kind) }}{% if catalog %}<input type="hidden" name="catalog" value="{{ catalog.meta.curriculum_id }}">{% endif %}{% endmacro %}
 {% macro reason(tree) %}
 <li><b>{{ tree.text }}</b> <span class="reason-status">· {{ status_label[tree.status] }}</span>
-{% if tree.source %}<small>{{ tree.source }}</small>{% endif %}
+{% if tree.source is defined %}<small>{{ tree.source or "NEEDS_VALIDATION · Sumber prasyarat perlu diverifikasi." }}</small>{% endif %}
 {% for attempt in tree.attempts %}<small><a href="{{ url_for('grades.detail',course_id=attempt.enrollment) }}">Buka pengambilan</a>{% if attempt.revision %} · Final r{{ attempt.revision }} · {{ attempt.source }}{% endif %}</small>{% endfor %}
 {% if tree.children %}<ul>{% for child in tree.children %}{{ reason(child) }}{% endfor %}</ul>{% endif %}</li>
 {% endmacro %}
@@ -25,7 +25,7 @@
 <script defer src="{{ url_for('static', filename='roadmap.js') }}"></script>
 <div id="save-error" class="alert" role="alert" tabindex="-1" hidden><p></p><a href="{{ url_for('roadmap.index') }}">Tinjau versi terbaru</a></div>
 <div class="map-heading">
-  <div><p class="crumb"><a href="{{ url_for('foundation.home') }}">Beranda</a> / Perencanaan studi</p>
+  <div><p class="crumb"><a href="{{ url_for('foundation.home') }}">Dashboard</a> / Perencanaan studi{% if term_scope %} · {{ term_scope.label }}{% endif %}</p>
   <h1>Academic <em>Roadmap</em></h1><p>Periksa prasyarat dari hasil aktualmu dan coba susunan semester.</p></div>
   {% if catalog %}<a class="button" href="#rencana">Ke rencana semester ↓</a>{% endif %}
 </div>
@@ -52,7 +52,7 @@
 {% for key,c in catalog.courses.items() %}
 {% if loop.changed(c.recommended) %}<h3 id="semester-{{ c.recommended or 'unknown' }}" class="map-term">{{ 'Semester rekomendasi '~c.recommended if c.recommended else 'Semester rekomendasi belum diketahui' }}</h3>{% endif %}
 <details class="map-course"><summary><span>{{ c.label }} <small>{{ c.sks }} SKS · {{ progress_label[progress[key]] }}{% if key in selected %} · Direncanakan S{{ selected[key] }}{% endif %}</small></span><span class="map-status {{ reasons[key].status }}">{{ status_label[reasons[key].status] }}</span></summary>
-<h4>Prasyarat berdasarkan catatan aktual</h4><ul class="map-reasons">{{ reason(reasons[key]) }}</ul>
+<h4 id="prasyarat-{{ key }}">Prasyarat berdasarkan catatan aktual</h4><ul class="map-reasons">{{ reason(reasons[key]) }}</ul>
 {% for attempt in evidence[key] %}<small><a href="{{ url_for('grades.detail',course_id=attempt.enrollment) }}">Lihat pengambilan {{ c.label }} di Grade Rescue</a></small>{% endfor %}
 <p class="hint">Menjadi prasyarat untuk {% for child in catalog.dependents[key] %}{{ catalog.courses[child].label }}{{ ', ' if not loop.last }}{% else %}—{% endfor %}.</p>
 <small>Kode {{ key }} · {{ c.source_ref }} · Aturan {{ c.rule_version }}{% if c.category %} · {{ c.category }}{% endif %}</small>
@@ -73,7 +73,7 @@
 <a href="{{ url_for('grades.new') }}">Tambah pengambilan di Grade Rescue →</a></section>
 <section class="panel map-plan" id="rencana"><h2>Simulator semester</h2><p>Simulasi — tidak mengubah riwayat atau IRS. Semua semester dan asumsi lulus di sini bersifat hipotetis.</p>
 {% if stale %}<div class="alert"><h3>Skenario perlu ditinjau</h3><p>Sumber berubah dari r{{ scenario.base_source_revision }} ke r{{ state.source_revision }}. Perhitungan ditahan sampai kamu mereset skenario.</p>
-<ul>{% set events={'confirm':'Hasil final','course-bind':'Kaitan pengambilan','catalog-activate':'Versi katalog','structure':'Struktur penilaian','scores':'Skor aktual','target':'Target mata kuliah'} %}{% for change in changes %}<li>r{{ change.source_revision }} · {{ events.get(change.event_type,change.event_type) }} · <code>{{ change.entity_id }}</code></li>{% endfor %}</ul></div>
+<ul>{% for change in changes %}<li>r{{ change.source_revision }} · {{ change_labels.get(change.event_type,change.event_type) }} · <code>{{ change.entity_id }}</code></li>{% endfor %}</ul></div>
 <details><summary>Lihat pilihan lama</summary><p>Katalog {{ plan.get('curriculum_id','—') }} · Batas {{ plan.get('cap') or '—' }} SKS · Semester akhir {{ assumptions.get('horizon','—') }}</p>
 <ul>{% for k,t in plan.get('selected',{}).items() %}<li>Kode {{ k }} · Semester {{ t }}{% if k in assumptions.get('passed',[]) %} · Asumsi lulus{% endif %}{% if k in assumptions.get('delay',{}) %} · Ditunda ke {{ assumptions.delay[k] }}{% endif %}</li>{% endfor %}
 {% for expr,child in assumptions.get('choices',{}).items() %}<li>{{ expr }} · Jalur {{ child }}</li>{% endfor %}</ul></details>

@@ -139,20 +139,32 @@ def save_plan(db, state, form, catalog):
     return catalog.meta["curriculum_id"]
 
 
-def read(db):
-    state, catalog, scenario = book.workspace(db), active_catalog(db), book.scenario(db)
-    view = dict(state=state, catalog=catalog, scenario=scenario)
-    if not catalog:
-        return view
-    evidence, unbound, excluded = actual_attempts(db, state, catalog)
-    plan = json.loads(scenario["plan"]) if scenario else {}
-    assumptions = json.loads(scenario["assumptions"]) if scenario else {}
+CHANGE_LABELS = {
+    "confirm": "Hasil final", "course-bind": "Kaitan pengambilan", "catalog-activate": "Versi katalog",
+    "structure": "Struktur penilaian", "scores": "Skor aktual", "target": "Target mata kuliah",
+}
+
+
+def scenario_context(db):
+    state, scenario = book.workspace(db), book.scenario(db)
     stale = bool(book.stale(scenario, state))
     changes = []
     if stale:
         changes = db.execute("""SELECT event_type,entity_id,source_revision FROM change_log
                                 WHERE epoch=? AND source_revision>? AND event_type NOT IN ('simulation','roadmap-plan','reset')
                                 ORDER BY state_revision""", (state["epoch"], scenario["base_source_revision"])).fetchall()
+    return dict(state=state, scenario=scenario, stale=stale, changes=changes, change_labels=CHANGE_LABELS)
+
+
+def read(db, context=None):
+    view = dict(context if context is not None else scenario_context(db))
+    catalog = view["catalog"] = active_catalog(db)
+    if not catalog:
+        return view
+    state, scenario, stale = view["state"], view["scenario"], view["stale"]
+    evidence, unbound, excluded = actual_attempts(db, state, catalog)
+    plan = json.loads(scenario["plan"]) if scenario else {}
+    assumptions = json.loads(scenario["assumptions"]) if scenario else {}
     selected = plan.get("selected", {}) if not stale else {}
     timing = engine.simulate(catalog, evidence, selected, assumptions) if selected else {}
     reasons = {k: engine.evaluate(c.get("rule"), evidence, c["source_ref"], catalog.courses)
@@ -160,7 +172,7 @@ def read(db):
     credits = engine.credits(catalog, evidence, selected, plan.get("cap"), excluded)
     projected = {key: term for key, (term, _) in timing.items() if term is not None}
     view.update(reasons=reasons, progress={k: engine.progress(evidence[k]) for k in catalog.courses},
-                evidence=evidence, unbound=unbound, plan=plan, assumptions=assumptions, stale=stale, changes=changes,
+                evidence=evidence, unbound=unbound, plan=plan, assumptions=assumptions,
                 timing=timing, credits=credits, selected=selected,
                 projected=engine.credits(catalog, {}, projected, plan.get("cap"), 0))
     return view

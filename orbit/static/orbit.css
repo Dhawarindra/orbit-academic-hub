@@ -121,3 +121,40 @@ summary {cursor:pointer;color:var(--teal);font-weight:650}details {margin-top:1r
  .metrics{grid-template-columns:1fr}.metrics div{padding:1rem}.brand span{display:none}
  .score-line{flex-wrap:wrap}.page-head .secondary{margin-bottom:.25rem}
 }
+
+/* Read-only academic overview */
+.dash-head,.dash-columns,.grade-facts,.dash-semesters {display:grid;gap:1rem}
+.dash-head {grid-template-columns:1fr minmax(15rem,auto);align-items:end;margin-bottom:1.5rem}
+.dash-head .crumb {margin-bottom:.4rem}
+.dash-head p:last-child {margin-bottom:0}
+.term-filter div {display:flex;gap:.5rem;align-items:center}
+.term-filter select {max-width:22rem;margin:0}
+.term-filter .secondary {min-height:44px;flex-shrink:0;white-space:nowrap}
+.dash-metrics {grid-template-columns:repeat(3,minmax(0,1fr))}
+.dash-metrics strong {font-size:clamp(1.45rem,3vw,2.2rem)}
+.dash-columns {grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);align-items:start}
+.dash-grades {border-top:3px solid #5f6eaa}
+.dash-road {border-top:3px solid var(--teal)}
+.dash-columns .section-head,.dash-plan .section-head {align-items:baseline;flex-wrap:wrap}
+.dash-columns .section-head>a,.dash-plan .section-head>a {font-size:.86rem}
+.dash-course {border-top:1px solid var(--line);margin-top:1.1rem;padding-top:1.1rem;overflow-wrap:anywhere}
+.dash-course h3 {margin:.25rem 0}
+.grade-facts {grid-template-columns:repeat(2,minmax(0,1fr));background:#f4f6fa;padding:.9rem;border-radius:8px;gap:.75rem}
+.grade-facts dt {color:var(--muted);font-size:.82rem}
+.grade-facts dd {margin:0;font-weight:650;font-variant-numeric:tabular-nums}
+.dash-whatif {background:#eef1fb;border-left:3px solid #5968a2;padding:.7rem 1rem;border-radius:6px}
+.dash-whatif p {margin:.25rem 0}
+.dash-eligibility {list-style:none;padding:0;margin:.5rem 0 1rem}
+.dash-eligibility li {display:flex;align-items:center;flex-wrap:wrap;gap:.3rem .7rem;padding:.8rem 0;border-top:1px solid var(--line)}
+.dash-eligibility small {width:100%}
+.dash-semesters {grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr))}
+.dash-semesters>div {border-top:1px solid var(--line);padding-top:1rem}
+.dash-empty {padding-top:1.4rem}
+.dash-notices ul,.dash-semesters ul {padding-left:1.2rem}
+.dash-notices li {margin:.45rem 0}
+.dash-plan,.dash-road,.dash-notices,.dash-head,.dash-metrics,.alert code {overflow-wrap:anywhere}
+@media(max-width:760px){
+  .dash-head,.dash-columns,.dash-metrics {grid-template-columns:minmax(0,1fr)}
+  .dash-columns {gap:0}
+  .term-filter div {max-width:100%}
+}

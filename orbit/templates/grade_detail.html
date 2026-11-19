@@ -13,12 +13,12 @@
 <div><small>Cakupan nilai</small><strong>{{ fmt(actual.observed_weight * 100) }}%</strong><span>Bobot dengan skor aktual</span></div>
 <div><small>Rentang akhir</small><strong>{{ fmt(actual.known) }}–{{ fmt(actual.upper) }}</strong><span>Kontribusi tercatat {{ fmt(actual.known) }} poin</span></div>
 </div>
-<div class="detail-grid"><section class="panel"><div class="section-head"><h2>Skor komponen</h2>{% if course.locked %}<small>Struktur terkunci</small>{% else %}<a href="{{ url_for('grades.edit',course_id=course.id) }}">Edit struktur</a>{% endif %}</div>
+<div class="detail-grid"><section class="panel" id="skor"><div class="section-head"><h2>Skor komponen</h2>{% if course.locked %}<small>Struktur terkunci</small>{% else %}<a href="{{ url_for('grades.edit',course_id=course.id) }}">Edit struktur</a>{% endif %}</div>
 <p>Kosong berarti belum diketahui. Isi 0 untuk skor nol yang tercatat.</p>
 <form method="post" action="{{ post('scores') }}">{{ meta(state, action=='scores') }}
 {% for i in items if i.maximum is not none %}<label class="score-line"><span><b>{{ i.path }}</b><small>Bobot efektif {{ fmt(i.effective * 100) }}%</small></span><span class="unit"><input aria-label="Skor aktual {{ i.path }}" name="score_{{ i.node_id }}" inputmode="decimal" placeholder="Kosong" value="{{ form.get('score_'~i.node_id,'') if action=='scores' else (i.earned if i.earned is not none else '') }}"><span>/ {{ i.maximum }}</span></span></label>{% endfor %}
 <button class="button">Simpan skor aktual</button></form></section>
-<section class="panel target"><h2>Target nilai</h2><p>Hitung kebutuhan dari komponen yang masih kosong.</p>
+<section class="panel target" id="target"><h2>Target nilai</h2><p>Hitung kebutuhan dari komponen yang masih kosong.</p>
 <form method="post" action="{{ post('target') }}">{{ meta(state, action=='target') }}
 <label>Target angka atau huruf<input name="target" value="{{ form.get('target','') if action=='target' else ((target.numeric_target or target.letter_target) if target else '') }}" placeholder="Mis. 75 atau A"></label>
 <button class="button">Hitung target</button></form>
@@ -27,7 +27,7 @@
 <small>{{ 'Kebijakan contoh kelas: A ≥ 85, B ≥ 70, C di bawah 70. Klasifikasi memakai presisi penuh.' if course.policy else 'Kebijakan huruf belum ditetapkan. Target angka tetap tersedia.' }}</small>
 {% if policy and actual.observed_weight==1 %}<p>Huruf model: <b>{{ classify(actual.known, policy) }}</b> (sebelum pembulatan).</p>{% endif %}</section></div>
 
-<section class="panel"><div class="section-head"><h2>Simulasi what-if</h2><small>Asumsi terpisah</small></div>
+<section class="panel" id="simulasi"><div class="section-head"><h2>Simulasi what-if</h2><small>Asumsi terpisah</small></div>
 {% if stale %}<p class="alert">Sumber berubah sejak simulasi disimpan. Tinjau skor aktual dan reset simulasi untuk menghitung kembali.</p>
 {% else %}<p>Isi hanya skor yang ingin dicoba. Komponen lain memakai skor aktual.</p>
 <form method="post" action="{{ post('simulation') }}">{{ meta(state, action=='simulation') }}
